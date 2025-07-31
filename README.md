@@ -19,12 +19,14 @@ A web application to track and manage class payments efficiently. Keep organized
 ### Installation
 
 1. Clone the repository
+
 ```bash
 git clone <your-repo-url>
 cd class-note
 ```
 
 2. Install dependencies
+
 ```bash
 npm install
 # or
@@ -32,6 +34,7 @@ yarn install
 ```
 
 3. Run the development server
+
 ```bash
 npm run dev
 # or
@@ -45,6 +48,7 @@ yarn dev
 ### 🚀 Phase 1: Core Features (High Priority)
 
 #### Data Models & Structure
+
 - [ ] Define TypeScript interfaces for:
   - [ ] Class (id, name, instructor, cost, date, status, category)
   - [ ] Payment (id, classId, amount, date, method, receipt)
@@ -52,6 +56,7 @@ yarn dev
   - [ ] Category (id, name, color, description)
 
 #### Class Management
+
 - [ ] Create class entry form component
   - [ ] Form validation
   - [ ] Date picker integration
@@ -67,6 +72,7 @@ yarn dev
 - [ ] Edit/delete class functionality
 
 #### Payment Tracking
+
 - [ ] Payment status management (paid, pending, overdue)
 - [ ] Payment history per class
 - [ ] Receipt upload and storage
@@ -76,6 +82,7 @@ yarn dev
 ### 💾 Phase 2: Data Management (Medium Priority)
 
 #### Storage Solutions
+
 - [ ] Choose and implement storage:
   - [ ] Local Storage (for demo/offline)
   - [ ] IndexedDB (for larger datasets)
@@ -83,6 +90,7 @@ yarn dev
   - [ ] SQLite (for desktop app version)
 
 #### Data Operations
+
 - [ ] CRUD operations for all entities
 - [ ] Data validation and error handling
 - [ ] Backup and restore functionality
@@ -92,6 +100,7 @@ yarn dev
 ### 📊 Phase 3: Analytics & Reports (Medium Priority)
 
 #### Dashboard & Statistics
+
 - [ ] Enhanced dashboard with:
   - [ ] Total spending overview
   - [ ] Monthly/yearly spending trends
@@ -100,6 +109,7 @@ yarn dev
   - [ ] Payment status distribution
 
 #### Charts & Visualizations
+
 - [ ] Implement chart library (Chart.js, Recharts, or D3)
 - [ ] Spending over time chart
 - [ ] Category pie chart
@@ -107,6 +117,7 @@ yarn dev
 - [ ] Monthly comparison charts
 
 #### Reports
+
 - [ ] Generate PDF reports
 - [ ] Email reports functionality
 - [ ] Tax deduction reports
@@ -116,6 +127,7 @@ yarn dev
 ### 🎨 Phase 4: UI/UX Enhancements (Low Priority)
 
 #### User Experience
+
 - [ ] Mobile-first responsive design
 - [ ] Keyboard shortcuts
 - [ ] Drag and drop for file uploads
@@ -124,6 +136,7 @@ yarn dev
 - [ ] Accessibility improvements (ARIA labels, screen reader support)
 
 #### Advanced Features
+
 - [ ] Multi-language support
 - [ ] Currency conversion
 - [ ] Recurring payment setup
@@ -134,6 +147,7 @@ yarn dev
 ### 🔧 Phase 5: Technical Improvements (Low Priority)
 
 #### Performance & Security
+
 - [ ] Code splitting and lazy loading
 - [ ] Image optimization
 - [ ] Caching strategies
@@ -142,6 +156,7 @@ yarn dev
 - [ ] Error logging and monitoring
 
 #### Testing
+
 - [ ] Unit tests for components
 - [ ] Integration tests for data flow
 - [ ] E2E tests for critical paths

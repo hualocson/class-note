@@ -1,7 +1,8 @@
-"use client"
+"use client";
 
-import React, { PropsWithChildren } from "react"
-import { ThemeProvider } from "./theme-provider"
+import React, { PropsWithChildren } from "react";
+
+import { ThemeProvider } from "./theme-provider";
 
 const Providers: React.FC<PropsWithChildren> = ({ children }) => {
   return (
@@ -12,7 +13,7 @@ const Providers: React.FC<PropsWithChildren> = ({ children }) => {
     >
       {children}
     </ThemeProvider>
-  )
-}
+  );
+};
 
-export default Providers
+export default Providers;
