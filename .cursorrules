@@ -222,10 +222,36 @@ return { success: true, data: result[0] };
 - ESLint and Prettier configured
 - TypeScript strict mode enabled
 
-## Commit Message Rules
+### Commit Types
 
-### Conventional Commits Format
+- **feat**: New feature
+- **fix**: Bug fix
+- **docs**: Documentation changes
+- **style**: Code style changes (formatting, missing semicolons, etc.)
+- **refactor**: Code refactoring (no functional changes)
+- **perf**: Performance improvements
+- **test**: Adding or updating tests
+- **chore**: Maintenance tasks, dependencies, etc.
+- **ci**: CI/CD changes
+- **build**: Build system changes
 
-```
-<type>[optional scop
-```
+### Commit Rules
+
+1. **Type is required** and must be lowercase
+2. **Scope is optional** but recommended for larger projects
+3. **Description is required** and should be in present tense
+4. **Keep description under 72 characters** for the first line
+5. **Use imperative mood** ("add" not "added")
+6. **Don't end with a period**
+7. **Use conventional commits format** for consistency
+8. **Include scope** when changes affect specific features (e.g., `feat(classes)`, `fix(ui)`)
+9. **Write descriptive messages** that explain what and why, not how
+10. **Use body for complex changes** that need additional explanation
+
+### Commit Message Guidelines
+
+- **Be specific**: Instead of "fix bug", use "fix(classes): resolve class deletion not working"
+- **Use consistent terminology**: Match the terminology used in your codebase
+- **Reference issues**: Include issue numbers when applicable (e.g., "fixes #123")
+- **Group related changes**: Make separate commits for different concerns
+- **Test before committing**: Ensure all tests pass before committing
