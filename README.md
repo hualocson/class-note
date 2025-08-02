@@ -180,6 +180,14 @@ src/
 └── hooks/              # Custom React hooks
 ```
 
+## Backlog
+
+- [ ] Make `/classes` page responsive (top of page)
+- [ ] Show edit button on mobile class cards (`/classes` page)
+- [ ] Add better form validation (`/classes` page)
+- [ ] Fix list refresh after changes (`/classes` page)
+- [ ] Add loading states to class list (`/classes` page)
+
 ## Tech Stack
 
 - **Framework**: Next.js 14 (App Router)
