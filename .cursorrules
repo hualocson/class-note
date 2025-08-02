@@ -1,0 +1,257 @@
+# Cursor Rules for Class Payment Tracker
+
+## Project Overview
+
+This is a Next.js 15 application for tracking class payments with TypeScript, Tailwind CSS, and Drizzle ORM.
+
+## Code Style & Conventions
+
+### TypeScript
+
+- Use strict TypeScript configuration
+- Prefer interfaces over types for object shapes
+- Use explicit return types for functions
+- Avoid `any` type - use proper typing
+- Use generic types when appropriate
+
+### React Components
+
+- Use functional components with hooks
+- Prefer named exports over default exports
+- Use proper TypeScript interfaces for props
+- Follow React naming conventions (PascalCase for components)
+- Use "use client" directive only when necessary
+
+### File Structure
+
+- Follow Next.js 15 App Router conventions
+- Group related components in feature folders
+- Use index files for clean imports
+- Keep components small and focused
+- Separate business logic from UI components
+
+### Naming Conventions
+
+- **Files**: kebab-case (e.g., `class-form.tsx`)
+- **Components**: PascalCase (e.g., `ClassForm`)
+- **Functions**: camelCase (e.g., `handleSubmit`)
+- **Constants**: UPPER_SNAKE_CASE (e.g., `DEFAULT_VALUES`)
+- **Types/Interfaces**: PascalCase (e.g., `ClassDataType`)
+
+### Database & Schema
+
+- Use Drizzle ORM for database operations
+- Follow snake_case for database columns
+- Use proper foreign key relationships
+- Implement soft deletes where appropriate
+- Use UUIDs for primary keys
+
+### Styling
+
+- Use Tailwind CSS for styling
+- Follow mobile-first responsive design
+- Use CSS custom properties for theming
+- Maintain consistent spacing and typography
+- Use semantic color names from design system
+
+### State Management
+
+- Use React hooks for local state
+- Prefer server actions over client-side state management
+- Use optimistic updates where appropriate
+- Handle loading and error states properly
+
+### Error Handling
+
+- Use try-catch blocks for async operations
+- Provide meaningful error messages
+- Log errors appropriately
+- Show user-friendly error states
+
+### Performance
+
+- Use React.memo for expensive components
+- Implement proper loading states
+- Optimize images and assets
+- Use Next.js built-in optimizations
+
+### Accessibility
+
+- Use semantic HTML elements
+- Provide proper ARIA labels
+- Ensure keyboard navigation works
+- Maintain proper color contrast
+- Test with screen readers
+
+### Testing
+
+- Write unit tests for utility functions
+- Test component behavior with user interactions
+- Mock external dependencies
+- Use descriptive test names
+
+### Git Workflow
+
+- Use conventional commits format
+- Keep commits small and focused
+- Write descriptive commit messages
+- Use feature branches for new development
+
+### Code Quality
+
+- Use ESLint and Prettier for code formatting
+- Follow DRY (Don't Repeat Yourself) principle
+- Write self-documenting code
+- Add comments for complex business logic
+- Use meaningful variable and function names
+
+### Security
+
+- Validate all user inputs
+- Use proper authentication and authorization
+- Sanitize data before database operations
+- Follow OWASP security guidelines
+- Use environment variables for sensitive data
+
+### Documentation
+
+- Keep README up to date
+- Document complex business logic
+- Use JSDoc for public APIs
+- Maintain changelog for releases
+
+## Specific Patterns
+
+### Server Actions
+
+```typescript
+"use server";
+
+export async function actionName(data: InputType) {
+  try {
+    // Validation
+    const validatedData = schema.parse(data);
+
+    // Database operation
+    const result = await db.operation(validatedData);
+
+    // Revalidation
+    revalidatePath("/path");
+
+    return { success: true, data: result };
+  } catch (error) {
+    console.error("Error in actionName:", error);
+    return { success: false, error: "User-friendly message" };
+  }
+}
+```
+
+### Form Components
+
+```typescript
+interface FormProps {
+  onSubmit?: (data: DataType) => void;
+  className?: string;
+  children?: (form: UseFormReturn) => React.ReactNode;
+}
+
+const FormComponent: React.FC<FormProps> = ({ onSubmit, className, children }) => {
+  const form = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: defaultValues,
+  });
+
+  const handleSubmit = async (data: DataType) => {
+    // Handle submission
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className={className}>
+        {children?.(form)}
+      </form>
+    </Form>
+  );
+};
+```
+
+### Database Queries
+
+```typescript
+// Use proper error handling and type safety
+const result = await db
+  .select()
+  .from(table)
+  .where(eq(table.id, id))
+  .limit(1);
+
+if (!result.length) {
+  return { success: false, error: "Not found" };
+}
+
+return { success: true, data: result[0] };
+```
+
+## Common Mistakes to Avoid
+
+- Don't use `any` type
+- Don't forget error handling
+- Don't mix client and server components unnecessarily
+- Don't hardcode values that should be configurable
+- Don't ignore accessibility requirements
+- Don't commit without testing
+- Don't use console.log in production code
+
+## Tools & Dependencies
+
+- Next.js 15 (App Router)
+- TypeScript
+- Tailwind CSS
+- Drizzle ORM
+- React Hook Form
+- Zod validation
+- Radix UI components
+- Lucide React icons
+- Sonner for toasts
+
+## Environment Setup
+
+- Node.js 18+
+- PostgreSQL database
+- Environment variables properly configured
+- ESLint and Prettier configured
+- TypeScript strict mode enabled
+
+### Commit Types
+
+- **feat**: New feature
+- **fix**: Bug fix
+- **docs**: Documentation changes
+- **style**: Code style changes (formatting, missing semicolons, etc.)
+- **refactor**: Code refactoring (no functional changes)
+- **perf**: Performance improvements
+- **test**: Adding or updating tests
+- **chore**: Maintenance tasks, dependencies, etc.
+- **ci**: CI/CD changes
+- **build**: Build system changes
+
+### Commit Rules
+
+1. **Type is required** and must be lowercase
+2. **Scope is optional** but recommended for larger projects
+3. **Description is required** and should be in present tense
+4. **Keep description under 72 characters** for the first line
+5. **Use imperative mood** ("add" not "added")
+6. **Don't end with a period**
+7. **Use conventional commits format** for consistency
+8. **Include scope** when changes affect specific features (e.g., `feat(classes)`, `fix(ui)`)
+9. **Write descriptive messages** that explain what and why, not how
+10. **Use body for complex changes** that need additional explanation
+
+### Commit Message Guidelines
+
+- **Be specific**: Instead of "fix bug", use "fix(classes): resolve class deletion not working"
+- **Use consistent terminology**: Match the terminology used in your codebase
+- **Reference issues**: Include issue numbers when applicable (e.g., "fixes #123")
+- **Group related changes**: Make separate commits for different concerns
+- **Test before committing**: Ensure all tests pass before committing
