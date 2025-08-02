@@ -1,18 +1,44 @@
-import ThemeToggleButton from "@/components/common/ThemeToggleButton";
+"use client";
+
+import { useRouter } from "next/navigation";
+
+import {
+  BarChart3,
+  BookOpen,
+  DollarSign,
+  HomeIcon,
+  Smartphone,
+} from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+
+import PageHeader from "@/components/common/PageHeader";
 
 export default function Home() {
+  const router = useRouter();
   return (
     <div className="bg-background text-foreground min-h-screen">
-      {/* Header */}
-      <header className="bg-background/80 border-border/50 sticky top-0 z-50 border-b backdrop-blur-sm">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4">
-          <h1 className="text-lg font-medium">Class Payment Tracker</h1>
-          <ThemeToggleButton />
-        </div>
-      </header>
+      {/* Reusable Header */}
+      <PageHeader
+        title="Class Payment Tracker"
+        icon={<HomeIcon className="text-primary h-6 w-6" />}
+      />
 
       {/* Main Content */}
       <main className="mx-auto max-w-4xl px-4 py-8">
+        {/* Quick Actions */}
+        <section className="mb-12">
+          <h3 className="mb-4 text-lg font-medium">Quick Start</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <Button className="w-full" onClick={() => router.push("/classes")}>
+              Class
+            </Button>
+            <Button variant="secondary" className="w-full">
+              Payment
+            </Button>
+          </div>
+        </section>
+
         {/* Hero Section */}
         <section className="mb-12">
           <h2 className="mb-3 text-2xl font-semibold sm:text-3xl">
@@ -52,7 +78,7 @@ export default function Home() {
             <div className="group border-border/50 hover:border-border rounded-lg border p-4 transition-colors">
               <div className="flex items-start gap-3">
                 <div className="bg-primary/10 mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg">
-                  <span className="text-primary text-sm">📚</span>
+                  <BookOpen className="text-primary h-4 w-4" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <h4 className="mb-1 font-medium">Class Management</h4>
@@ -67,7 +93,7 @@ export default function Home() {
             <div className="group border-border/50 hover:border-border rounded-lg border p-4 transition-colors">
               <div className="flex items-start gap-3">
                 <div className="bg-primary/10 mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg">
-                  <span className="text-primary text-sm">💰</span>
+                  <DollarSign className="text-primary h-4 w-4" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <h4 className="mb-1 font-medium">Payment Tracking</h4>
@@ -82,7 +108,7 @@ export default function Home() {
             <div className="group border-border/50 hover:border-border rounded-lg border p-4 transition-colors">
               <div className="flex items-start gap-3">
                 <div className="bg-primary/10 mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg">
-                  <span className="text-primary text-sm">📊</span>
+                  <BarChart3 className="text-primary h-4 w-4" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <h4 className="mb-1 font-medium">Analytics & Reports</h4>
@@ -97,7 +123,7 @@ export default function Home() {
             <div className="group border-border/50 hover:border-border rounded-lg border p-4 transition-colors">
               <div className="flex items-start gap-3">
                 <div className="bg-primary/10 mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg">
-                  <span className="text-primary text-sm">📱</span>
+                  <Smartphone className="text-primary h-4 w-4" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <h4 className="mb-1 font-medium">Mobile First</h4>
@@ -108,19 +134,6 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* Quick Actions */}
-        <section className="mt-12">
-          <h3 className="mb-4 text-lg font-medium">Quick Start</h3>
-          <div className="grid grid-cols-2 gap-3">
-            <button className="bg-primary text-primary-foreground hover:bg-primary/90 w-full rounded-lg px-4 py-3 text-sm font-medium transition-colors">
-              Add Class
-            </button>
-            <button className="bg-secondary text-secondary-foreground hover:bg-secondary/90 w-full rounded-lg px-4 py-3 text-sm font-medium transition-colors">
-              Record Payment
-            </button>
           </div>
         </section>
       </main>
