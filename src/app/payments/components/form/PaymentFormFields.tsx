@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { cn } from "@/lib/utils";
 import { type SelectClassType } from "@/schemas/classes";
 import { format } from "date-fns";
@@ -41,6 +43,15 @@ const PaymentFormFields: React.FC<IPaymentFormFieldsProps> = ({
   form,
   classes,
 }) => {
+  const classId = form.watch("classId");
+  // change amount if selected class is changed
+  useEffect(() => {
+    const selectedClass = classes.find((c) => c.id === classId);
+    if (selectedClass) {
+      form.setValue("amount", Number(selectedClass.price));
+    }
+  }, [classId, classes, form]);
+
   return (
     <>
       {/* Date */}
@@ -123,6 +134,7 @@ const PaymentFormFields: React.FC<IPaymentFormFieldsProps> = ({
               <Input
                 placeholder="150000"
                 {...field}
+                value={field.value?.toString() ?? "0"}
                 onChange={(e) => field.onChange(Number(e.target.value))}
                 onBlur={(e) => field.onChange(Number(e.target.value))}
               />
