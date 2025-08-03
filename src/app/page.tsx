@@ -33,7 +33,11 @@ export default function Home() {
             <Button className="w-full" onClick={() => router.push("/classes")}>
               Class
             </Button>
-            <Button variant="secondary" className="w-full">
+            <Button
+              variant="secondary"
+              className="w-full"
+              onClick={() => router.push("/payments")}
+            >
               Payment
             </Button>
           </div>

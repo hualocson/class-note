@@ -25,7 +25,7 @@ export default function PageHeader({
       className={`bg-background/80 border-border/50 sticky top-0 z-50 border-b backdrop-blur-sm ${className}`}
     >
       <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {onBack && (
             <Button variant="ghost" onClick={onBack} size={"icon"}>
               <ArrowLeftIcon />
