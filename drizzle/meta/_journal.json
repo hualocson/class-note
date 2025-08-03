@@ -8,6 +8,13 @@
       "when": 1753972671252,
       "tag": "0000_perfect_mindworm",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1754190965228,
+      "tag": "0001_chubby_black_widow",
+      "breakpoints": true
     }
   ]
 }
