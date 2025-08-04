@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 const ClassActions: React.FC = () => {
   const router = useRouter();
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2 *:flex-1">
       <Button variant="outline" onClick={() => router.push("/payments")}>
         <DollarSignIcon />
         Payment
