@@ -21,7 +21,7 @@ import ClassForm from "./form/ClassForm";
 import ClassFormFields from "./form/ClassFormFields";
 import { type ClassDataType } from "./form/schema";
 
-interface ClassDrawerProps {
+interface ClassDialogProps {
   triggerText?: string;
   triggerIcon?: React.ReactNode;
   title?: string;
@@ -34,7 +34,7 @@ interface ClassDrawerProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-const ClassDrawer: React.FC<ClassDrawerProps> = ({
+const ClassDialog: React.FC<ClassDialogProps> = ({
   triggerText = "Add Class",
   triggerIcon = <Plus className="h-4 w-4" />,
   title = "Add New Class",
@@ -126,4 +126,4 @@ const ClassDrawer: React.FC<ClassDrawerProps> = ({
   );
 };
 
-export default ClassDrawer;
+export default ClassDialog;
