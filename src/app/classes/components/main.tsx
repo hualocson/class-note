@@ -16,7 +16,7 @@ const MainClassesPage = () => {
       {/* Reusable Header */}
       <PageHeader
         title="Classes"
-        icon={<BookOpen className="text-primary h-6 w-6" />}
+        icon={<BookOpen className="text-primary size-4" />}
         onBack={() => router.push("/")}
       >
         {/* Add Class Button will be in the listing component */}
