@@ -6,11 +6,16 @@ import { getClasses } from "@/actions/classes";
 import { SelectClassType } from "@/schemas/classes";
 import { toast } from "sonner";
 
+import { ClassDataType } from "../form/schema";
 import ClassCard from "./ClassCard";
 import ClassesLoadingState from "./ClassesLoadingState";
 import EmptyClassesState from "./EmptyClassesState";
 
-const ClassesGrid: React.FC = () => {
+interface IClassesGridProps {
+  onEdit: (classItem: { id?: string; data: ClassDataType }) => void;
+}
+
+const ClassesGrid: React.FC<IClassesGridProps> = ({ onEdit }) => {
   const [classes, setClasses] = useState<SelectClassType[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -47,7 +52,22 @@ const ClassesGrid: React.FC = () => {
   return (
     <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
       {classes.map((classItem) => (
-        <ClassCard key={classItem.id} classItem={classItem} />
+        <ClassCard
+          key={classItem.id}
+          classItem={classItem}
+          onEdit={() =>
+            onEdit({
+              id: classItem.id,
+              data: {
+                name: classItem.name,
+                code: classItem.code || "",
+                price: classItem.price || 0,
+                color: classItem.color || "",
+                sortOrder: classItem.sortOrder || 0,
+              },
+            })
+          }
+        />
       ))}
     </div>
   );

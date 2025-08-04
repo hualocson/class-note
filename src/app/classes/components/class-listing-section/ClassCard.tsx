@@ -19,9 +19,10 @@ import {
 
 interface ClassCardProps {
   classItem: SelectClassType;
+  onEdit: (classItem: SelectClassType) => void;
 }
 
-const ClassCard: React.FC<ClassCardProps> = ({ classItem }) => {
+const ClassCard: React.FC<ClassCardProps> = ({ classItem, onEdit }) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -72,7 +73,7 @@ const ClassCard: React.FC<ClassCardProps> = ({ classItem }) => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onEdit(classItem)}>
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
               </DropdownMenuItem>
