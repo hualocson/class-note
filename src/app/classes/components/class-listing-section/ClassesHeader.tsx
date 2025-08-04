@@ -6,7 +6,11 @@ import { Input } from "@/components/ui/input";
 
 import ClassActions from "./ClassActions";
 
-const ClassesHeader: React.FC = () => {
+interface IClassesHeaderProps {
+  onAddClass: () => void;
+}
+
+const ClassesHeader: React.FC<IClassesHeaderProps> = ({ onAddClass }) => {
   return (
     <div className="mb-4 flex flex-col justify-between gap-2 md:flex-row md:items-center">
       <div className="relative flex grow items-center gap-2">
@@ -15,7 +19,7 @@ const ClassesHeader: React.FC = () => {
         </span>
         <Input type="search" placeholder="Search classes..." className="pl-8" />
       </div>
-      <ClassActions />
+      <ClassActions onAddClass={onAddClass} />
     </div>
   );
 };
