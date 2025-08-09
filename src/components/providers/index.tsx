@@ -2,8 +2,12 @@
 
 import React, { PropsWithChildren } from "react";
 
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 import { Toaster } from "../ui/sonner";
 import { ThemeProvider } from "./theme-provider";
+
+const queryClient = new QueryClient();
 
 const Providers: React.FC<PropsWithChildren> = ({ children }) => {
   return (
@@ -13,7 +17,9 @@ const Providers: React.FC<PropsWithChildren> = ({ children }) => {
         defaultTheme="light"
         disableTransitionOnChange
       >
-        {children}
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
       </ThemeProvider>
       <Toaster />
     </>
