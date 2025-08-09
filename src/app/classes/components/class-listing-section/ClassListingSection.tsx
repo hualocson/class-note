@@ -18,7 +18,12 @@ const ClassListingSection: React.FC = () => {
     <>
       <section>
         {/* Classes List */}
-        <ClassesHeader onAddClass={() => setIsDialogOpen(true)} />
+        <ClassesHeader
+          onAddClass={() => {
+            setClassToEdit(null);
+            setIsDialogOpen(true);
+          }}
+        />
         <ClassesGrid
           onEdit={(classItem) => {
             setClassToEdit(classItem);
