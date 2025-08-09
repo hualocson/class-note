@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { type SelectClassType } from "@/schemas/classes";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Loader2 } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
@@ -37,11 +37,13 @@ import { PaymentDataInput, PaymentDataOutput } from "./schema";
 interface IPaymentFormFieldsProps {
   classes: SelectClassType[];
   form: UseFormReturn<PaymentDataInput, unknown, PaymentDataOutput>;
+  isLoading?: boolean;
 }
 
 const PaymentFormFields: React.FC<IPaymentFormFieldsProps> = ({
   form,
   classes,
+  isLoading,
 }) => {
   const classId = form.watch("classId");
   // change amount if selected class is changed
@@ -106,13 +108,24 @@ const PaymentFormFields: React.FC<IPaymentFormFieldsProps> = ({
             <FormLabel>Class *</FormLabel>
             <FormControl>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full" disabled={isLoading}>
                   <SelectValue placeholder="Select a class" />
+                  {isLoading && (
+                    <Loader2 className="ml-auto h-4 w-4 animate-spin" />
+                  )}
                 </SelectTrigger>
                 <SelectContent>
                   {classes.map((classItem) => (
                     <SelectItem key={classItem.id} value={classItem.id}>
-                      {classItem.name} ({classItem.code})
+                      <span
+                        style={{
+                          backgroundColor: classItem.color ?? "black",
+                        }}
+                        className="size-3 rounded-full"
+                      ></span>
+                      <span>
+                        {classItem.name} ({classItem.code})
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -177,9 +190,9 @@ const PaymentFormFields: React.FC<IPaymentFormFieldsProps> = ({
             <FormLabel>Notes</FormLabel>
             <FormControl>
               <Textarea
-                rows={5}
                 placeholder="Add any notes here"
                 {...field}
+                rows={6}
                 className="resize-none"
               />
             </FormControl>

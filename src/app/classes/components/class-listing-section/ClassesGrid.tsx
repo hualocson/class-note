@@ -1,10 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-import { getClasses } from "@/actions/classes";
-import { SelectClassType } from "@/schemas/classes";
-import { toast } from "sonner";
+import useClassesQuery from "@/hooks/useClassesQuery";
 
 import { ClassDataType } from "../form/schema";
 import ClassCard from "./ClassCard";
@@ -16,59 +12,41 @@ interface IClassesGridProps {
 }
 
 const ClassesGrid: React.FC<IClassesGridProps> = ({ onEdit }) => {
-  const [classes, setClasses] = useState<SelectClassType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const classesQueryData = useClassesQuery();
 
-  useEffect(() => {
-    loadClasses();
-  }, []);
+  const totalClasses = classesQueryData.data?.rowCount ?? 0;
 
-  const loadClasses = async () => {
-    try {
-      setLoading(true);
-      const result = await getClasses();
-
-      if (result.success) {
-        setClasses(result.data.rows);
-      } else {
-        toast.error(result.error || "Failed to load classes");
-      }
-    } catch (error) {
-      console.error("Error loading classes:", error);
-      toast.error("An unexpected error occurred");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+  if (classesQueryData.isPending) {
     return <ClassesLoadingState />;
   }
 
-  if (classes.length === 0) {
+  if (classesQueryData.data?.rowCount === 0) {
     return <EmptyClassesState />;
   }
 
   return (
-    <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
-      {classes.map((classItem) => (
-        <ClassCard
-          key={classItem.id}
-          classItem={classItem}
-          onEdit={() =>
-            onEdit({
-              id: classItem.id,
-              data: {
-                name: classItem.name,
-                code: classItem.code || "",
-                price: classItem.price || 0,
-                color: classItem.color || "",
-                sortOrder: classItem.sortOrder || 0,
-              },
-            })
-          }
-        />
-      ))}
+    <div className="space-y-2">
+      <h3 className="text-lg font-medium">Total Classes: {totalClasses}</h3>
+      <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+        {classesQueryData.data?.rows.map((classItem) => (
+          <ClassCard
+            key={classItem.id}
+            classItem={classItem}
+            onEdit={() =>
+              onEdit({
+                id: classItem.id,
+                data: {
+                  name: classItem.name,
+                  code: classItem.code || "",
+                  price: classItem.price || 0,
+                  color: classItem.color || "",
+                  sortOrder: classItem.sortOrder || 0,
+                },
+              })
+            }
+          />
+        ))}
+      </div>
     </div>
   );
 };

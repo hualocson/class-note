@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import { getClasses } from "@/actions/classes";
-import { createPayment, updatePayment } from "@/actions/payments";
-import { type SelectClassType } from "@/schemas/classes";
+import useClassesQuery from "@/hooks/useClassesQuery";
+import usePaymentActions from "@/hooks/usePaymentActions";
 import { DollarSign } from "lucide-react";
 import { toast } from "sonner";
 
@@ -32,7 +31,6 @@ interface PaymentDialogProps {
   } | null;
   openState?: boolean;
   onOpenChange?: (open: boolean) => void;
-  onSuccess?: () => void;
 }
 
 const PaymentDialog: React.FC<PaymentDialogProps> = ({
@@ -41,10 +39,10 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
   defaultValues,
   openState,
   onOpenChange,
-  onSuccess,
 }) => {
   const [isOpen, setIsOpen] = useState(openState || false);
-  const [classes, setClasses] = useState<SelectClassType[]>([]);
+  const classesQueryData = useClassesQuery();
+  const { createPaymentMutation, updatePaymentMutation } = usePaymentActions();
 
   const { title, description } = defaultValues
     ? {
@@ -56,39 +54,23 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
         description: "Create a new payment record",
       };
 
-  // Load classes for the select dropdown
-  useEffect(() => {
-    const loadClasses = async () => {
-      try {
-        const result = await getClasses();
-        if (result.success) {
-          setClasses(result.data.rows);
-        }
-      } catch (error) {
-        console.error("Error loading classes:", error);
-      }
-    };
-
-    const isDialogOpen = openState !== undefined ? openState : isOpen;
-    if (isDialogOpen) {
-      loadClasses();
-    }
-  }, [openState, isOpen]);
-
   const handleUpdate = async (data: PaymentDataType) => {
-    const response = await updatePayment(defaultValues?.id || "", data);
-
     if (!defaultValues?.id) {
+      toast.error("Payment not found");
       return;
     }
 
-    if (response.success) {
-      toast.success("Payment updated successfully");
-      onSuccess?.();
-      onClose();
-    } else {
-      toast.error(response.error || "Failed to update payment");
-    }
+    updatePaymentMutation.mutate(
+      {
+        id: defaultValues.id,
+        data,
+      },
+      {
+        onSuccess: () => {
+          onClose();
+        },
+      }
+    );
   };
 
   const handleSubmit = async (data: PaymentDataType) => {
@@ -97,15 +79,11 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
       return;
     }
 
-    const response = await createPayment(data);
-
-    if (response.success) {
-      toast.success("Payment created successfully");
-      onSuccess?.();
-      onClose();
-    } else {
-      toast.error(response.error || "Failed to create payment");
-    }
+    createPaymentMutation.mutate(data, {
+      onSuccess: () => {
+        onClose();
+      },
+    });
   };
 
   const onClose = () => {
@@ -138,7 +116,11 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
         >
           {(form) => (
             <>
-              <PaymentFormFields form={form} classes={classes} />
+              <PaymentFormFields
+                form={form}
+                classes={classesQueryData.data?.rows ?? []}
+                isLoading={classesQueryData.isPending}
+              />
               <DialogFooter className="border-t pt-4">
                 <Button
                   type="button"
@@ -148,8 +130,20 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
                 >
                   Cancel
                 </Button>
-                <Button type="submit" className="flex-1">
-                  {defaultValues?.id ? "Update Payment" : "Add Payment"}
+                <Button
+                  type="submit"
+                  className="flex-1"
+                  disabled={
+                    createPaymentMutation.isPending ||
+                    updatePaymentMutation.isPending
+                  }
+                >
+                  {createPaymentMutation.isPending ||
+                  updatePaymentMutation.isPending
+                    ? "Saving..."
+                    : defaultValues?.id
+                      ? "Update Payment"
+                      : "Add Payment"}
                 </Button>
               </DialogFooter>
             </>
