@@ -104,6 +104,7 @@ export async function deleteClass(id: string) {
       .set({
         name: `deleted_name_${oldClass.name}`,
         code: `deleted_code_${oldClass.code}`,
+        isDeleted: true,
         deletedAt: new Date(),
         updatedAt: new Date(),
       })
