@@ -242,12 +242,6 @@ const ClassesListing: React.FC<ClassesListingProps> = ({ className }) => {
         openState={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         defaultValues={selectedClass ? selectedClass : undefined}
-        title={selectedClass ? "Edit Class" : "Add Class"}
-        description={
-          selectedClass
-            ? "Edit the class with the form below."
-            : "Create a new class with the form below."
-        }
       />
     </>
   );
