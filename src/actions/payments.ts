@@ -235,35 +235,52 @@ export async function getPaymentById(
   }
 }
 
-export async function getPaymentStats() {
+export async function getPaymentStats(month?: string) {
   try {
-    const payments = await db.select().from(paymentsTable);
-
-    const totalAmount = payments.reduce(
-      (sum, payment) => sum + payment.amount,
-      0
+    // Calculate first day and last day of the month
+    const monthDate = month ? new Date(month) : new Date();
+    const firstDayOfMonth = new Date(
+      monthDate.getFullYear(),
+      monthDate.getMonth(),
+      1
     );
-    const paidAmount = payments
-      .filter((payment) => payment.status === "paid")
-      .reduce((sum, payment) => sum + payment.amount, 0);
+    const lastDayOfMonth = new Date(
+      monthDate.getFullYear(),
+      monthDate.getMonth() + 1,
+      0,
+      23,
+      59,
+      59,
+      999
+    );
 
-    const currentMonth = new Date();
-    currentMonth.setDate(1);
-    currentMonth.setHours(0, 0, 0, 0);
+    const [stats] = await db
+      .select({
+        totalAmount: sql<number>`COALESCE(SUM(amount), 0)`.mapWith(Number),
+        paidAmount:
+          sql<number>`COALESCE(SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END), 0)`.mapWith(
+            Number
+          ),
+        pendingAmount:
+          sql<number>`COALESCE(SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END), 0)`.mapWith(
+            Number
+          ),
+        cancelledAmount:
+          sql<number>`COALESCE(SUM(CASE WHEN status = 'cancelled' THEN amount ELSE 0 END), 0)`.mapWith(
+            Number
+          ),
+      })
+      .from(paymentsTable)
+      .innerJoin(classesTable, eq(paymentsTable.classId, classesTable.id))
+      .where(
+        and(
+          gte(paymentsTable.date, firstDayOfMonth),
+          lte(paymentsTable.date, lastDayOfMonth),
+          eq(classesTable.isDeleted, false)
+        )
+      );
 
-    const thisMonthAmount = payments
-      .filter(
-        (payment) =>
-          payment.status === "paid" && new Date(payment.date) >= currentMonth
-      )
-      .reduce((sum, payment) => sum + payment.amount, 0);
-
-    return makeActionSuccess({
-      totalAmount,
-      paidAmount,
-      thisMonthAmount,
-      totalPayments: payments.length,
-    });
+    return makeActionSuccess(stats);
   } catch (error) {
     console.error("Error fetching payment stats:", error);
 
@@ -272,5 +289,73 @@ export async function getPaymentStats() {
     }
 
     return makeActionError("Failed to fetch payment stats");
+  }
+}
+
+interface IGetPaymentsClassStatsQuery {
+  month?: string;
+  status?: "paid" | "pending" | "cancelled";
+}
+
+export async function getPaymentsClassStats(
+  query?: IGetPaymentsClassStatsQuery
+) {
+  const { month, status } = query ?? {
+    month: new Date().toISOString().split("T")[0],
+    status: "pending",
+  };
+  try {
+    // Calculate first day and last day of the month
+    const monthDate = month ? new Date(month) : new Date();
+    const firstDayOfMonth = new Date(
+      monthDate.getFullYear(),
+      monthDate.getMonth(),
+      1
+    );
+    const lastDayOfMonth = new Date(
+      monthDate.getFullYear(),
+      monthDate.getMonth() + 1,
+      0,
+      23,
+      59,
+      59,
+      999
+    );
+
+    const stats = await db
+      .select({
+        classId: paymentsTable.classId,
+        className: classesTable.name,
+        classCode: classesTable.code,
+        classColor: classesTable.color,
+        totalAmount: sql<number>`sum(${paymentsTable.amount})`.mapWith(Number),
+      })
+      .from(paymentsTable)
+      .innerJoin(classesTable, eq(paymentsTable.classId, classesTable.id))
+      .where(
+        and(
+          eq(classesTable.isDeleted, false),
+          ...(status ? [eq(paymentsTable.status, status)] : []),
+          gte(paymentsTable.date, firstDayOfMonth),
+          lte(paymentsTable.date, lastDayOfMonth)
+        )
+      )
+      .groupBy(
+        paymentsTable.classId,
+        classesTable.name,
+        classesTable.code,
+        classesTable.color
+      )
+      .orderBy(desc(sql`sum(${paymentsTable.amount})`));
+
+    return makeActionSuccess(stats);
+  } catch (error) {
+    console.error("Error fetching payment class stats:", error);
+
+    if (error instanceof Error) {
+      return makeActionError(error.message);
+    }
+
+    return makeActionError("Failed to fetch payment class stats");
   }
 }

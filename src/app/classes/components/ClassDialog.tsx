@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { createClass, updateClass } from "@/actions/classes";
+import useClassAction from "@/hooks/useClassAction";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -24,8 +24,6 @@ import { type ClassDataType } from "./form/schema";
 interface ClassDialogProps {
   triggerText?: string;
   triggerIcon?: React.ReactNode;
-  title?: string;
-  description?: string;
   defaultValues?: {
     id?: string;
     data: ClassDataType;
@@ -37,27 +35,35 @@ interface ClassDialogProps {
 const ClassDialog: React.FC<ClassDialogProps> = ({
   triggerText = "Add Class",
   triggerIcon = <Plus className="h-4 w-4" />,
-  title = "Add New Class",
-  description = "Create a new class with the form below.",
   defaultValues,
   openState,
   onOpenChange,
 }) => {
   const [isOpen, setIsOpen] = useState(openState || false);
+  const { createClassMutation, updateClassMutation } = useClassAction();
+
+  const title = defaultValues?.id ? "Edit Class" : "Add Class";
+  const description = defaultValues?.id
+    ? "Update class details"
+    : "Create a new class with the form below.";
 
   const handleUpdate = async (data: ClassDataType) => {
-    const response = await updateClass(defaultValues?.id || "", data);
-
     if (!defaultValues?.id) {
+      toast.error("Class not found");
       return;
     }
 
-    if (response.success) {
-      toast.success("Class updated successfully");
-      onClose();
-    } else {
-      toast.error(response.error);
-    }
+    updateClassMutation.mutate(
+      {
+        id: defaultValues.id,
+        data,
+      },
+      {
+        onSuccess: () => {
+          onClose();
+        },
+      }
+    );
   };
 
   const handleSubmit = async (data: ClassDataType) => {
@@ -66,14 +72,11 @@ const ClassDialog: React.FC<ClassDialogProps> = ({
       return;
     }
 
-    const response = await createClass(data);
-
-    if (response.success) {
-      toast.success("Class created successfully");
-      onClose();
-    } else {
-      toast.error(response.error);
-    }
+    createClassMutation.mutate(data, {
+      onSuccess: () => {
+        onClose();
+      },
+    });
   };
 
   const onClose = () => {
@@ -114,8 +117,18 @@ const ClassDialog: React.FC<ClassDialogProps> = ({
                 >
                   Cancel
                 </Button>
-                <Button type="submit" className="flex-1">
-                  {defaultValues?.id ? "Update Class" : "Add Class"}
+                <Button
+                  type="submit"
+                  className="flex-1"
+                  disabled={
+                    createClassMutation.isPending ||
+                    updateClassMutation.isPending
+                  }
+                >
+                  {createClassMutation.isPending ||
+                  updateClassMutation.isPending
+                    ? "Saving..."
+                    : "Save"}
                 </Button>
               </DialogFooter>
             </>

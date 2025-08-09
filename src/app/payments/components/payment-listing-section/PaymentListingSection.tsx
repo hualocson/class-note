@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import { deletePayment, getPayments } from "@/actions/payments";
-import { SelectClassType } from "@/schemas/classes";
-import { type SelectPayment } from "@/schemas/payments";
-import { toast } from "sonner";
+import { getPayments } from "@/actions/payments";
+import usePaymentActions from "@/hooks/usePaymentActions";
+import { useQuery } from "@tanstack/react-query";
 
 import PaymentDialog from "../PaymentDialog";
 import { PaymentDataType } from "../form/schema";
@@ -15,14 +14,18 @@ import PaymentsHeader from "./PaymentsHeader";
 import PaymentsLoadingState from "./PaymentsLoadingState";
 
 const PaymentListingSection: React.FC = () => {
-  const [payments, setPayments] = useState<
-    Array<
-      SelectPayment & {
-        class: Pick<SelectClassType, "name" | "code" | "color">;
+  const paymentsQueryData = useQuery({
+    queryKey: ["payments"],
+    queryFn: async () => {
+      const result = await getPayments();
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to load payments");
       }
-    >
-  >([]);
-  const [loading, setLoading] = useState(true);
+
+      return result.data;
+    },
+  });
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<{
@@ -30,47 +33,15 @@ const PaymentListingSection: React.FC = () => {
     data: PaymentDataType;
   } | null>(null);
 
-  // Load payments on component mount
-  useEffect(() => {
-    loadPayments();
-  }, []);
-
-  const loadPayments = async () => {
-    try {
-      setLoading(true);
-      const result = await getPayments();
-
-      if (result.success) {
-        setPayments(result.data.rows);
-      } else {
-        toast.error(result.error || "Failed to load payments");
-      }
-    } catch (error) {
-      console.error("Error loading payments:", error);
-      toast.error("An unexpected error occurred");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { deletePaymentMutation } = usePaymentActions();
 
   const handleDeletePayment = async (id: string) => {
-    try {
-      const result = await deletePayment(id);
-
-      if (result.success) {
-        toast.success("Payment deleted successfully");
-        loadPayments(); // Reload the list
-      } else {
-        toast.error(result.error || "Failed to delete payment");
-      }
-    } catch (error) {
-      console.error("Error deleting payment:", error);
-      toast.error("An unexpected error occurred");
-    }
-  };
-
-  const handleRefresh = () => {
-    loadPayments();
+    deletePaymentMutation.mutate(id, {
+      onSuccess: () => {
+        setIsDialogOpen(false);
+        paymentsQueryData.refetch();
+      },
+    });
   };
 
   const handleAddPayment = () => {
@@ -86,28 +57,21 @@ const PaymentListingSection: React.FC = () => {
     setIsDialogOpen(true);
   };
 
-  const handleSuccess = () => {
-    setIsDialogOpen(false);
-    setSelectedPayment(null);
-    handleRefresh();
-  };
-
   return (
     <>
       <section>
         <PaymentsHeader
-          paymentCount={payments.length}
-          onRefresh={handleRefresh}
+          paymentCount={paymentsQueryData.data?.rowCount ?? 0}
           onAddPayment={handleAddPayment}
         />
 
-        {loading ? (
+        {paymentsQueryData.isPending ? (
           <PaymentsLoadingState />
-        ) : payments.length === 0 ? (
+        ) : paymentsQueryData.data?.rowCount === 0 ? (
           <EmptyPaymentsState onAddPayment={handleAddPayment} />
         ) : (
           <PaymentsGrid
-            payments={payments}
+            payments={paymentsQueryData.data?.rows ?? []}
             onEdit={handleEditPayment}
             onDelete={handleDeletePayment}
           />
@@ -118,7 +82,6 @@ const PaymentListingSection: React.FC = () => {
         openState={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         defaultValues={selectedPayment !== null ? selectedPayment : undefined}
-        onSuccess={handleSuccess}
       />
     </>
   );

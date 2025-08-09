@@ -1,12 +1,11 @@
 "use client";
 
-import { PropsWithChildren, useEffect, useState } from "react";
+import { PropsWithChildren } from "react";
 
-import { getPayments } from "@/actions/payments";
-import { PaymentStatus } from "@/enums";
+import { getPaymentStats } from "@/actions/payments";
 import formatPrice from "@/lib/format-price";
+import { useQuery } from "@tanstack/react-query";
 import { Clock, DollarSign, TrendingUp, XCircle } from "lucide-react";
-import { toast } from "sonner";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -21,75 +20,21 @@ const MobileItem: React.FC<PropsWithChildren> = ({ children }) => {
   );
 };
 
-interface PaymentStats {
-  totalAmount: number;
-  paidAmount: number;
-  pendingAmount: number;
-  cancelledAmount: number;
-}
-
 const PaymentStatsSection: React.FC = () => {
-  const [stats, setStats] = useState<PaymentStats>({
-    totalAmount: 0,
-    paidAmount: 0,
-    pendingAmount: 0,
-    cancelledAmount: 0,
-  });
-  const [loading, setLoading] = useState(true);
+  const { data, isPending } = useQuery({
+    queryKey: ["payment-stats", new Date().getMonth()],
+    queryFn: async () => {
+      const result = await getPaymentStats();
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        setLoading(true);
-        const result = await getPayments();
-
-        if (result.success) {
-          const payments = result.data.rows;
-
-          // Calculate stats from the payments data
-          const newStats = payments.reduce(
-            (acc, payment) => {
-              const amount = Number(payment.amount);
-              acc.totalAmount += amount;
-
-              switch (payment.status) {
-                case PaymentStatus.PAID:
-                  acc.paidAmount += amount;
-                  break;
-                case PaymentStatus.PENDING:
-                  acc.pendingAmount += amount;
-                  break;
-                case PaymentStatus.CANCELLED:
-                  acc.cancelledAmount += amount;
-                  break;
-              }
-
-              return acc;
-            },
-            {
-              totalAmount: 0,
-              paidAmount: 0,
-              pendingAmount: 0,
-              cancelledAmount: 0,
-            }
-          );
-
-          setStats(newStats);
-        } else {
-          toast.error(result.error || "Failed to load payment stats");
-        }
-      } catch (error) {
-        console.error("Error fetching payment stats:", error);
-        toast.error("An unexpected error occurred");
-      } finally {
-        setLoading(false);
+      if (!result.success) {
+        throw new Error(result.error || "Failed to load payment stats");
       }
-    };
 
-    fetchStats();
-  }, []);
+      return result.data;
+    },
+  });
 
-  if (loading) {
+  if (isPending) {
     return (
       <div className="mb-6">
         <div className="hidden gap-2 md:grid-cols-2 lg:grid-cols-4">
@@ -132,7 +77,7 @@ const PaymentStatsSection: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatPrice(stats.totalAmount)}
+              {formatPrice(data?.totalAmount ?? 0)}
             </div>
           </CardContent>
         </Card>
@@ -144,7 +89,7 @@ const PaymentStatsSection: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatPrice(stats.paidAmount)}
+              {formatPrice(data?.paidAmount ?? 0)}
             </div>
           </CardContent>
         </Card>
@@ -158,7 +103,7 @@ const PaymentStatsSection: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatPrice(stats.pendingAmount)}
+              {formatPrice(data?.pendingAmount ?? 0)}
             </div>
           </CardContent>
         </Card>
@@ -172,7 +117,7 @@ const PaymentStatsSection: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatPrice(stats.cancelledAmount)}
+              {formatPrice(data?.cancelledAmount ?? 0)}
             </div>
           </CardContent>
         </Card>
@@ -190,7 +135,7 @@ const PaymentStatsSection: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {formatPrice(stats.totalAmount)}
+                  {formatPrice(data?.totalAmount ?? 0)}
                 </div>
               </CardContent>
             </Card>
@@ -206,7 +151,7 @@ const PaymentStatsSection: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {formatPrice(stats.paidAmount)}
+                  {formatPrice(data?.paidAmount ?? 0)}
                 </div>
               </CardContent>
             </Card>
@@ -222,7 +167,7 @@ const PaymentStatsSection: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {formatPrice(stats.pendingAmount)}
+                  {formatPrice(data?.pendingAmount ?? 0)}
                 </div>
               </CardContent>
             </Card>
@@ -238,7 +183,7 @@ const PaymentStatsSection: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {formatPrice(stats.cancelledAmount)}
+                  {formatPrice(data?.cancelledAmount ?? 0)}
                 </div>
               </CardContent>
             </Card>

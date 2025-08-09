@@ -1,12 +1,9 @@
 "use client";
 
-import { useState } from "react";
-
-import { deleteClass } from "@/actions/classes";
+import useClassAction from "@/hooks/useClassAction";
 import formatPrice from "@/lib/format-price";
 import { SelectClassType } from "@/schemas/classes";
-import { BookOpen, Edit, MoreHorizontal, Trash2 } from "lucide-react";
-import { toast } from "sonner";
+import { BookOpen, Edit, Loader2, MoreHorizontal, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -23,29 +20,10 @@ interface ClassCardProps {
 }
 
 const ClassCard: React.FC<ClassCardProps> = ({ classItem, onEdit }) => {
-  const [isDeleting, setIsDeleting] = useState(false);
+  const { deleteClassMutation } = useClassAction();
 
-  const handleDelete = async () => {
-    if (!classItem.id) {
-      return;
-    }
-
-    try {
-      setIsDeleting(true);
-      const result = await deleteClass(classItem.id);
-
-      if (result.success) {
-        toast.success("Class deleted successfully");
-        // You might want to trigger a refresh here
-      } else {
-        toast.error(result.error || "Failed to delete class");
-      }
-    } catch (error) {
-      console.error("Error deleting class:", error);
-      toast.error("An unexpected error occurred");
-    } finally {
-      setIsDeleting(false);
-    }
+  const handleDelete = () => {
+    deleteClassMutation.mutate(classItem.id);
   };
 
   return (
@@ -79,11 +57,15 @@ const ClassCard: React.FC<ClassCardProps> = ({ classItem, onEdit }) => {
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={handleDelete}
-                disabled={isDeleting}
-                className="text-destructive"
+                disabled={deleteClassMutation.isPending}
+                variant="destructive"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
-                Delete
+                {deleteClassMutation.isPending ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  "Delete"
+                )}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

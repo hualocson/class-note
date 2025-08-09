@@ -1,18 +1,16 @@
 import { useRouter } from "next/navigation";
 
-import { BookOpen, Plus, RefreshCcw } from "lucide-react";
+import { BookOpen, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
 interface PaymentsHeaderProps {
   paymentCount: number;
-  onRefresh: () => void;
   onAddPayment: () => void;
 }
 
 const PaymentsHeader: React.FC<PaymentsHeaderProps> = ({
   paymentCount,
-  onRefresh,
   onAddPayment,
 }) => {
   const router = useRouter();
@@ -25,9 +23,6 @@ const PaymentsHeader: React.FC<PaymentsHeaderProps> = ({
             {paymentCount} payment{paymentCount !== 1 ? "s" : ""} found
           </p>
         </div>
-        <Button variant="outline" size="icon" onClick={onRefresh}>
-          <RefreshCcw />
-        </Button>
       </div>
       <div className="flex items-center gap-2 *:flex-1">
         <Button variant="outline" onClick={() => router.push("/classes")}>
