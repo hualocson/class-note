@@ -1,5 +1,6 @@
 "use client";
 
+import { PaymentStatus } from "@/enums";
 import { cn } from "@/lib/utils";
 
 import {
@@ -10,11 +11,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-type PaymentStatusType = "pending" | "paid" | "cancelled";
-
 interface PaymentStatusSelectProps {
-  value?: PaymentStatusType;
-  onChange?: (value: PaymentStatusType) => void;
+  value?: PaymentStatus;
+  onChange?: (value: PaymentStatus) => void;
   className?: string;
 }
 
@@ -26,15 +25,15 @@ const PaymentStatusSelect: React.FC<PaymentStatusSelectProps> = ({
   return (
     <Select
       value={value}
-      onValueChange={(value) => onChange?.(value as PaymentStatusType)}
+      onValueChange={(value) => onChange?.(value as PaymentStatus)}
     >
       <SelectTrigger className={cn("w-[180px]", className)}>
         <SelectValue placeholder="Select status" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="pending">Pending</SelectItem>
-        <SelectItem value="paid">Paid</SelectItem>
-        <SelectItem value="cancelled">Cancelled</SelectItem>
+        <SelectItem value={PaymentStatus.PENDING}>Pending</SelectItem>
+        <SelectItem value={PaymentStatus.PAID}>Paid</SelectItem>
+        <SelectItem value={PaymentStatus.CANCELLED}>Cancelled</SelectItem>
       </SelectContent>
     </Select>
   );

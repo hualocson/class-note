@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { getPaymentsClassStats } from "@/actions/payments";
+import { PaymentStatus } from "@/enums";
 import { useQuery } from "@tanstack/react-query";
 
 import {
@@ -57,9 +58,9 @@ const LoadingState = () => {
 
 const ClassPaymentsStatsGrid = () => {
   const [month, setMonth] = useState<Date>(new Date());
-  const [paymentStatus, setPaymentStatus] = useState<
-    "pending" | "paid" | "cancelled"
-  >("pending");
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(
+    PaymentStatus.PENDING
+  );
   const queryData = useQuery({
     queryKey: ["payments-class-stats", month.toISOString(), paymentStatus],
     queryFn: async () => {
@@ -83,7 +84,7 @@ const ClassPaymentsStatsGrid = () => {
 
   return (
     <section className="space-y-2">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-lg font-medium">
           Total:{" "}
           {new Intl.NumberFormat("vi-VN", {
@@ -94,7 +95,8 @@ const ClassPaymentsStatsGrid = () => {
         <div className="flex items-center gap-2">
           <PaymentStatusSelect
             value={paymentStatus}
-            onChange={setPaymentStatus}
+            onChange={(status) => setPaymentStatus(status)}
+            className="w-full sm:w-[180px]"
           />
           <MonthSelect value={month} onChange={setMonth} />
         </div>
