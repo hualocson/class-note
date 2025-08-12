@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 
-import useClassesQuery from "@/hooks/useClassesQuery";
 import usePaymentActions from "@/hooks/usePaymentActions";
 import { DollarSign } from "lucide-react";
 import { toast } from "sonner";
@@ -41,7 +40,6 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
   onOpenChange,
 }) => {
   const [isOpen, setIsOpen] = useState(openState || false);
-  const classesQueryData = useClassesQuery();
   const { createPaymentMutation, updatePaymentMutation } = usePaymentActions();
 
   const { title, description } = defaultValues
@@ -116,11 +114,7 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
         >
           {(form) => (
             <>
-              <PaymentFormFields
-                form={form}
-                classes={classesQueryData.data?.rows ?? []}
-                isLoading={classesQueryData.isPending}
-              />
+              <PaymentFormFields form={form} />
               <DialogFooter className="border-t pt-4">
                 <Button
                   type="button"
