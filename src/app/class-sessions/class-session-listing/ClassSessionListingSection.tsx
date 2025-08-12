@@ -109,8 +109,11 @@ const ClassSessionListingSection = () => {
 
   return (
     <>
-      <section className="space-y-4">
-        <ClassSessionHeader onAddClassSession={handleAddClassSession} />
+      <section className="flex w-full flex-col">
+        <ClassSessionHeader
+          onAddClassSession={handleAddClassSession}
+          className="px-4"
+        />
         {classSessionsQueryData.isLoading ? (
           <LoadingState />
         ) : (
