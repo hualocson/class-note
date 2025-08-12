@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { db } from "@/db";
+import { PaymentStatus } from "@/enums";
 import { SelectClassType, classesTable } from "@/schemas/classes";
 import { SelectPayment, paymentsTable } from "@/schemas/payments";
 import { and, desc, eq, getTableColumns, gte, lte, sql } from "drizzle-orm";
@@ -14,20 +15,14 @@ import {
 } from "./utils";
 
 export interface CreatePaymentData {
-  date: string;
+  date: Date;
   classId: string;
   amount: number;
-  status: "paid" | "pending" | "cancelled";
+  status: PaymentStatus;
   notes?: string;
 }
 
-export interface UpdatePaymentData {
-  date?: string;
-  classId?: string;
-  amount?: number;
-  status?: "paid" | "pending" | "cancelled";
-  notes?: string;
-}
+export type UpdatePaymentData = Partial<CreatePaymentData>;
 
 export async function createPayment(
   data: CreatePaymentData
@@ -44,8 +39,6 @@ export async function createPayment(
         notes: data.notes,
       })
       .returning();
-
-    revalidatePath("/payments");
 
     return makeActionSuccess(newPayment);
   } catch (error) {
@@ -65,13 +58,7 @@ export async function updatePayment(
 ): Promise<ActionResponse<SelectPayment>> {
   try {
     // Build the update object with only provided fields
-    const updateData: Partial<{
-      date: Date;
-      classId: string;
-      amount: number;
-      status: "paid" | "pending" | "cancelled";
-      notes: string | null;
-    }> = {};
+    const updateData: UpdatePaymentData = {};
 
     if (data.date) {
       updateData.date = new Date(data.date);
@@ -142,7 +129,7 @@ export async function deletePayment(
 }
 
 export async function getPayments(options?: {
-  status?: "paid" | "pending" | "cancelled";
+  status?: PaymentStatus;
   classId?: string;
   startDate?: string;
   endDate?: string;
@@ -294,7 +281,7 @@ export async function getPaymentStats(month?: string) {
 
 interface IGetPaymentsClassStatsQuery {
   month?: string;
-  status?: "paid" | "pending" | "cancelled";
+  status?: PaymentStatus;
 }
 
 export async function getPaymentsClassStats(
@@ -302,7 +289,7 @@ export async function getPaymentsClassStats(
 ) {
   const { month, status } = query ?? {
     month: new Date().toISOString().split("T")[0],
-    status: "pending",
+    status: PaymentStatus.PENDING,
   };
   try {
     // Calculate first day and last day of the month
