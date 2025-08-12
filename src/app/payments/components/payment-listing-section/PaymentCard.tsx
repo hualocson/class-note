@@ -1,6 +1,5 @@
 "use client";
 
-import { PaymentStatus } from "@/enums";
 import formatDate from "@/lib/format-date";
 import formatPrice from "@/lib/format-price";
 import { SelectClassType } from "@/schemas/classes";
@@ -69,10 +68,10 @@ const PaymentCard: React.FC<PaymentCardProps> = ({
     onEdit({
       id: payment.id,
       data: {
-        date: new Date(payment.date).toISOString(),
+        date: payment.date,
         classId: payment.classId,
         amount: payment.amount,
-        status: payment.status as PaymentStatus,
+        status: payment.status,
         notes: payment.notes || "",
       },
     });
