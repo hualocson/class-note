@@ -14,7 +14,10 @@ const usePaymentActions = () => {
 
   const createPaymentMutation = useMutation({
     mutationFn: async (data: PaymentDataType) => {
-      const result = await createPayment(data);
+      const result = await createPayment({
+        ...data,
+        date: new Date(data.date),
+      });
 
       if (!result.success) {
         throw new Error(result.error || "Failed to create payment");
@@ -34,7 +37,10 @@ const usePaymentActions = () => {
 
   const updatePaymentMutation = useMutation({
     mutationFn: async (data: { id: string; data: PaymentDataType }) => {
-      const result = await updatePayment(data.id, data.data);
+      const result = await updatePayment(data.id, {
+        ...data.data,
+        date: new Date(data.data.date),
+      });
 
       if (!result.success) {
         throw new Error(result.error || "Failed to update payment");

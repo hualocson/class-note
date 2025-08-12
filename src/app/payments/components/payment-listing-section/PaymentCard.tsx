@@ -68,7 +68,7 @@ const PaymentCard: React.FC<PaymentCardProps> = ({
     onEdit({
       id: payment.id,
       data: {
-        date: payment.date,
+        date: payment.date.toISOString(),
         classId: payment.classId,
         amount: payment.amount,
         status: payment.status,
