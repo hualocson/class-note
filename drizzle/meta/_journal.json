@@ -15,6 +15,13 @@
       "when": 1754190965228,
       "tag": "0001_chubby_black_widow",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1755003530494,
+      "tag": "0002_shallow_robbie_robertson",
+      "breakpoints": true
     }
   ]
 }
