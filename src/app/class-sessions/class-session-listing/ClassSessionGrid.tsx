@@ -32,7 +32,7 @@ const ClassSessionGrid: FC<IClassSessionGridProps> = ({
   onFinishClassSession,
 }) => {
   return classSessions.rows.length > 0 ? (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 content-start gap-4 px-4 md:grid-cols-2 lg:grid-cols-3">
       {classSessions.rows.map((classSession) => (
         <ClassSessionCard
           key={classSession.id}
