@@ -15,9 +15,14 @@ const ClassSessionHeader: React.FC<ClassSessionHeaderProps> = ({
   onAddClassSession,
 }) => {
   return (
-    <div className={cn("flex items-center justify-between", className)}>
+    <div
+      className={cn(
+        "bg-background/70 safe-area-top safe-area-bottom sticky top-[65px] z-50 flex items-center justify-between backdrop-blur-sm",
+        className
+      )}
+    >
       <div className="flex items-center gap-4">
-        <h2 className="text-xl font-semibold">All Sessions</h2>
+        <h2 className="text-lg font-semibold md:text-xl">All Sessions</h2>
       </div>
       <div className="flex items-center gap-4">
         <Button className="flex items-center gap-2" onClick={onAddClassSession}>

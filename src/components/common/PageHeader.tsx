@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 
+import { cn } from "@/lib/utils";
 import { ArrowLeftIcon } from "lucide-react";
 
 import { Button } from "../ui/button";
@@ -22,7 +23,10 @@ export default function PageHeader({
 }: PageHeaderProps) {
   return (
     <header
-      className={`bg-background/80 border-border/50 sticky top-0 z-50 border-b backdrop-blur-sm ${className}`}
+      className={cn(
+        "bg-background/80 border-border/50 sticky top-0 z-50 border-b backdrop-blur-sm",
+        className
+      )}
     >
       <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4">
         <div className="flex items-center gap-2">

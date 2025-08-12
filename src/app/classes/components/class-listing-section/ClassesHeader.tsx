@@ -12,7 +12,7 @@ interface IClassesHeaderProps {
 
 const ClassesHeader: React.FC<IClassesHeaderProps> = ({ onAddClass }) => {
   return (
-    <div className="mb-4 flex flex-col justify-between gap-2 md:flex-row md:items-center">
+    <div className="mb-4 flex items-center justify-between gap-2">
       <div className="relative flex grow items-center gap-2">
         <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
           <SearchIcon className="size-4" />
