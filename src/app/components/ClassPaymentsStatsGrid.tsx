@@ -83,7 +83,7 @@ const ClassPaymentsStatsGrid = () => {
   );
 
   return (
-    <section className="space-y-2">
+    <section className="flex w-full flex-col gap-3 md:gap-4">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-lg font-medium">
           Total:{" "}

@@ -102,7 +102,7 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
           </Button>
         </DialogTrigger>
       )}
-      <DialogContent>
+      <DialogContent className="px-0">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
@@ -114,8 +114,10 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
         >
           {(form) => (
             <>
-              <PaymentFormFields form={form} />
-              <DialogFooter className="border-t pt-4">
+              <div className="flex max-h-[50svh] w-full flex-col gap-3 overflow-y-auto px-6 md:gap-4">
+                <PaymentFormFields form={form} />
+              </div>
+              <DialogFooter className="border-t px-6 pt-4">
                 <Button
                   type="button"
                   variant="outline"

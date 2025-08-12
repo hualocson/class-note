@@ -1,7 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
 import { BookOpen } from "lucide-react";
 
 import PageHeader from "@/components/common/PageHeader";
@@ -9,15 +7,12 @@ import PageHeader from "@/components/common/PageHeader";
 import ClassListingSection from "./class-listing-section/ClassListingSection";
 
 const MainClassesPage = () => {
-  const router = useRouter();
-
   return (
-    <div className="bg-background text-foreground min-h-screen">
+    <div className="bg-background text-foreground">
       {/* Reusable Header */}
       <PageHeader
         title="Classes"
         icon={<BookOpen className="text-primary size-4" />}
-        onBack={() => router.push("/")}
       >
         {/* Add Class Button will be in the listing component */}
       </PageHeader>

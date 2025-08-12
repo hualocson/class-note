@@ -2,7 +2,7 @@ import MainClassSessionsPage from "./components/main";
 
 const ClassSessionsPage = () => {
   return (
-    <div className="bg-background text-foreground min-h-screen">
+    <div className="bg-background text-foreground">
       <MainClassSessionsPage />
     </div>
   );
