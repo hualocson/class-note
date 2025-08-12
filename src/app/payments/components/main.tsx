@@ -1,7 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
 import { DollarSign } from "lucide-react";
 
 import PageHeader from "@/components/common/PageHeader";
@@ -10,15 +8,12 @@ import PaymentStatsSection from "./PaymentStatsSeciton";
 import PaymentListingSection from "./payment-listing-section/PaymentListingSection";
 
 const MainPaymentsPage = () => {
-  const router = useRouter();
-
   return (
-    <div className="bg-background text-foreground min-h-screen">
+    <div className="bg-background text-foreground">
       {/* Reusable Header */}
       <PageHeader
         title="Payments"
         icon={<DollarSign className="text-primary size-4" />}
-        onBack={() => router.push("/")}
       >
         {/* Add Payment Button will be in the listing component */}
       </PageHeader>
