@@ -1,6 +1,4 @@
-import { useRouter } from "next/navigation";
-
-import { BookOpen, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -13,9 +11,8 @@ const PaymentsHeader: React.FC<PaymentsHeaderProps> = ({
   paymentCount,
   onAddPayment,
 }) => {
-  const router = useRouter();
   return (
-    <div className="mb-6 flex flex-col justify-between gap-2 md:flex-row md:items-center">
+    <div className="mb-6 flex items-center justify-between gap-2">
       <div className="flex grow items-center justify-between gap-2">
         <div className="flex flex-col">
           <h2 className="text-lg font-semibold">Payment Records</h2>
@@ -24,16 +21,10 @@ const PaymentsHeader: React.FC<PaymentsHeaderProps> = ({
           </p>
         </div>
       </div>
-      <div className="flex items-center gap-2 *:flex-1">
-        <Button variant="outline" onClick={() => router.push("/classes")}>
-          <BookOpen className="h-4 w-4" />
-          Classes
-        </Button>
-        <Button onClick={onAddPayment}>
-          <Plus />
-          Add Payment
-        </Button>
-      </div>
+      <Button onClick={onAddPayment}>
+        <Plus />
+        Add Payment
+      </Button>
     </div>
   );
 };
