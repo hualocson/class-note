@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import React, { FC, useState } from "react";
 
-import usePaymentActions from "@/hooks/usePaymentActions";
-import { DollarSign } from "lucide-react";
+import useClassSessionActions from "@/hooks/useClassSessionActions";
+import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -17,71 +17,72 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import PaymentFormFields from "./form/PaymentFormFields";
-import PaymentFormProvider from "./form/PaymentFormProvider";
-import { type PaymentDataType } from "./form/schema";
+import ClassSessionFields from "./form/ClassSessionFields";
+import ClassSessionFormProvider from "./form/ClassSessionFormProvider";
+import { ClassSessionDataType } from "./form/schema";
 
-interface PaymentDialogProps {
+interface IClassSessionDialogProps {
   triggerText?: string;
   triggerIcon?: React.ReactNode;
-  defaultValues?: {
-    id?: string;
-    data: PaymentDataType;
-  } | null;
   openState?: boolean;
   onOpenChange?: (open: boolean) => void;
+  defaultValues?: {
+    id?: string;
+    data: ClassSessionDataType;
+  } | null;
 }
-
-const PaymentDialog: React.FC<PaymentDialogProps> = ({
-  triggerText = "Add Payment",
-  triggerIcon = <DollarSign />,
-  defaultValues,
+const ClassSessionDialog: FC<IClassSessionDialogProps> = ({
+  triggerText = "Add Class Session",
+  triggerIcon = <Plus />,
   openState,
   onOpenChange,
+  defaultValues,
 }) => {
   const [isOpen, setIsOpen] = useState(openState || false);
-  const { createPaymentMutation, updatePaymentMutation } = usePaymentActions();
+  const { createClassSessionMutation, updateClassSessionMutation } =
+    useClassSessionActions();
 
   const { title, description } = defaultValues
     ? {
-        title: "Edit Payment",
-        description: "Update payment details",
+        title: "Edit Class Session",
+        description: "Update class session details",
       }
     : {
-        title: "Add Payment",
-        description: "Create a new payment record",
+        title: "Add Class Session",
+        description: "Add new class session",
       };
 
-  const handleUpdate = async (data: PaymentDataType) => {
+  const handleUpdate = async (data: ClassSessionDataType) => {
     if (!defaultValues?.id) {
-      toast.error("Payment not found");
+      toast.error("Class session not found");
       return;
     }
 
-    updatePaymentMutation.mutate(
+    updateClassSessionMutation.mutate(
       {
         id: defaultValues.id,
         data,
       },
       {
         onSuccess: () => {
+          toast.success("Class session updated successfully");
           onClose();
         },
       }
     );
   };
 
-  const handleSubmit = async (data: PaymentDataType) => {
+  const handleSubmit = async (data: ClassSessionDataType) => {
     if (defaultValues?.id) {
       await handleUpdate(data);
-      return;
+    } else {
+      createClassSessionMutation.mutate(data, {
+        onSuccess: () => {
+          toast.success("Class session created successfully");
+          onClose();
+        },
+      });
     }
-
-    createPaymentMutation.mutate(data, {
-      onSuccess: () => {
-        onClose();
-      },
-    });
   };
 
   const onClose = () => {
@@ -96,6 +97,7 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
     >
       {openState === undefined && onOpenChange === undefined && (
         <DialogTrigger asChild>
+          j
           <Button>
             {triggerIcon}
             {triggerText}
@@ -108,13 +110,13 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
-        <PaymentFormProvider
+        <ClassSessionFormProvider
           onSubmit={handleSubmit}
           defaultValues={defaultValues?.data}
         >
           {(form) => (
             <>
-              <PaymentFormFields form={form} />
+              <ClassSessionFields form={form} />
               <DialogFooter className="border-t pt-4">
                 <Button
                   type="button"
@@ -128,24 +130,24 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
                   type="submit"
                   className="flex-1"
                   disabled={
-                    createPaymentMutation.isPending ||
-                    updatePaymentMutation.isPending
+                    createClassSessionMutation.isPending ||
+                    updateClassSessionMutation.isPending
                   }
                 >
-                  {createPaymentMutation.isPending ||
-                  updatePaymentMutation.isPending
+                  {createClassSessionMutation.isPending ||
+                  updateClassSessionMutation.isPending
                     ? "Saving..."
                     : defaultValues?.id
-                      ? "Update Payment"
-                      : "Add Payment"}
+                      ? "Update Class Session"
+                      : "Add Class Session"}
                 </Button>
               </DialogFooter>
             </>
           )}
-        </PaymentFormProvider>
+        </ClassSessionFormProvider>
       </DialogContent>
     </Dialog>
   );
 };
 
-export default PaymentDialog;
+export default ClassSessionDialog;

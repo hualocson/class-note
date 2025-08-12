@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
+import { PaymentStatus } from "@/enums";
 import { cn } from "@/lib/utils";
 import { type SelectClassType } from "@/schemas/classes";
 import { format } from "date-fns";
-import { CalendarIcon, Loader2 } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
@@ -32,27 +33,24 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
+import ClassesSelect from "@/components/common/ClassesSelect";
+
 import { PaymentDataInput, PaymentDataOutput } from "./schema";
 
 interface IPaymentFormFieldsProps {
-  classes: SelectClassType[];
   form: UseFormReturn<PaymentDataInput, unknown, PaymentDataOutput>;
-  isLoading?: boolean;
 }
 
-const PaymentFormFields: React.FC<IPaymentFormFieldsProps> = ({
-  form,
-  classes,
-  isLoading,
-}) => {
-  const classId = form.watch("classId");
-  // change amount if selected class is changed
+const PaymentFormFields: React.FC<IPaymentFormFieldsProps> = ({ form }) => {
+  const [selectedClass, setSelectedClass] = useState<SelectClassType | null>(
+    null
+  );
+
   useEffect(() => {
-    const selectedClass = classes.find((c) => c.id === classId);
     if (selectedClass) {
       form.setValue("amount", Number(selectedClass.price));
     }
-  }, [classId, classes, form]);
+  }, [selectedClass, form]);
 
   return (
     <>
@@ -107,29 +105,11 @@ const PaymentFormFields: React.FC<IPaymentFormFieldsProps> = ({
           <FormItem>
             <FormLabel>Class *</FormLabel>
             <FormControl>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <SelectTrigger className="w-full" disabled={isLoading}>
-                  <SelectValue placeholder="Select a class" />
-                  {isLoading && (
-                    <Loader2 className="ml-auto h-4 w-4 animate-spin" />
-                  )}
-                </SelectTrigger>
-                <SelectContent>
-                  {classes.map((classItem) => (
-                    <SelectItem key={classItem.id} value={classItem.id}>
-                      <span
-                        style={{
-                          backgroundColor: classItem.color ?? "black",
-                        }}
-                        className="size-3 rounded-full"
-                      ></span>
-                      <span>
-                        {classItem.name} ({classItem.code})
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <ClassesSelect
+                value={field.value}
+                onChange={field.onChange}
+                onClassChange={setSelectedClass}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -170,9 +150,15 @@ const PaymentFormFields: React.FC<IPaymentFormFieldsProps> = ({
                   <SelectValue placeholder="Select a status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="paid">Paid</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                  <SelectItem value={PaymentStatus.PENDING}>
+                    {PaymentStatus.PENDING}
+                  </SelectItem>
+                  <SelectItem value={PaymentStatus.PAID}>
+                    {PaymentStatus.PAID}
+                  </SelectItem>
+                  <SelectItem value={PaymentStatus.CANCELLED}>
+                    {PaymentStatus.CANCELLED}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </FormControl>

@@ -1,3 +1,4 @@
+import { PaymentStatus } from "@/enums";
 import { relations } from "drizzle-orm";
 import {
   bigint,
@@ -8,24 +9,32 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
+import { classSessionsTable } from "./class-sessions";
 import { classesTable } from "./classes";
 import { timestampColumns } from "./entities/timestamp-columns";
+import { paymentStatusEnum } from "./enums";
 
 export const paymentsTable = pgTable(
   "payments",
   {
     id: uuid().primaryKey().defaultRandom(),
-    date: timestamp("date", {
-      withTimezone: true,
-    })
-      .notNull()
-      .defaultNow(),
+
+    date: timestamp("date", { withTimezone: true }).notNull().defaultNow(),
+
     classId: uuid()
       .notNull()
       .references(() => classesTable.id, { onDelete: "restrict" }),
-    amount: bigint({ mode: "number" }).notNull(), // Store as 180000, 130000 (VND)
-    status: text().default("paid").notNull(), // 'paid', 'pending', 'cancelled'
+
+    sessionId: uuid().references(() => classSessionsTable.id, {
+      onDelete: "set null",
+    }), // Optional link to session
+
+    amount: bigint({ mode: "number" }).notNull(), // VND
+
+    status: paymentStatusEnum().default(PaymentStatus.PAID).notNull(),
+
     notes: text(),
+
     ...timestampColumns,
   },
   (table) => [
@@ -40,6 +49,10 @@ export const paymentsRelations = relations(paymentsTable, ({ one }) => ({
   class: one(classesTable, {
     fields: [paymentsTable.classId],
     references: [classesTable.id],
+  }),
+  session: one(classSessionsTable, {
+    fields: [paymentsTable.sessionId],
+    references: [classSessionsTable.id],
   }),
 }));
 

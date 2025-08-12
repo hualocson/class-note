@@ -21,9 +21,9 @@ export const classesTable = pgTable(
   {
     id: uuid().primaryKey().defaultRandom(),
     name: text().notNull(),
-    code: text(), // Optional code like 'C47', 'C28'
+    code: text(), // Optional short code like 'C47'
     color: text().default("#3b82f6"), // Hex color for UI
-    price: bigint({ mode: "number" }).notNull(), // Store as 180000, 130000 (VND)
+    price: bigint({ mode: "number" }).notNull(), // Default fee per session
     sortOrder: integer().default(0),
 
     ...softDeleteColumns,
