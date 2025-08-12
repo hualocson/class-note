@@ -32,7 +32,7 @@ export default function PageHeader({
             </Button>
           )}
           {icon && <div className="flex-shrink-0">{icon}</div>}
-          <h1 className="text-lg font-medium">{title}</h1>
+          <h1 className="text-primary text-lg font-medium">{title}</h1>
         </div>
 
         <div className="flex items-center gap-2">
