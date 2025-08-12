@@ -2,10 +2,7 @@ import { z } from "zod";
 
 export const classSessionSchema = z.object({
   classId: z.string().min(1, "Class is required"),
-  date: z
-    .string()
-    .min(1, "Date is required")
-    .transform((val) => new Date(val)),
+  date: z.string().min(1, "Date is required"),
   fee: z.number().min(1, "Fee is required"),
   notes: z.string().optional(),
 });
@@ -22,7 +19,7 @@ export const classSessionValidationMessages = {
 } as const;
 
 export const classSessionDefaultValues = {
-  date: new Date().toLocaleString(),
+  date: new Date().toISOString(),
   fee: 0,
   notes: "",
 } as const;
