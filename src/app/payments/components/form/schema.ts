@@ -2,10 +2,7 @@ import { PaymentStatus } from "@/enums";
 import * as z from "zod";
 
 export const paymentSchema = z.object({
-  date: z
-    .string()
-    .min(1, "Date is required")
-    .transform((val) => new Date(val)),
+  date: z.string().min(1, "Date is required"),
   classId: z.string().min(1, "Class is required"),
   amount: z.number().min(1, "Amount must be greater than 0"),
   status: z.enum(PaymentStatus),
@@ -25,7 +22,7 @@ export const paymentValidationMessages = {
 } as const;
 
 export const paymentDefaultValues = {
-  date: new Date(),
+  date: new Date().toISOString(),
   classId: "",
   amount: 0,
   status: PaymentStatus.PENDING,
