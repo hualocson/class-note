@@ -2,7 +2,10 @@ import { PaymentStatus } from "@/enums";
 import * as z from "zod";
 
 export const paymentSchema = z.object({
-  date: z.date().min(1, "Date is required"),
+  date: z
+    .string()
+    .min(1, "Date is required")
+    .transform((val) => new Date(val)),
   classId: z.string().min(1, "Class is required"),
   amount: z.number().min(1, "Amount must be greater than 0"),
   status: z.enum(PaymentStatus),
