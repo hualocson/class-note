@@ -98,7 +98,7 @@ const ClassDialog: React.FC<ClassDialogProps> = ({
         </DialogTrigger>
       )}
       <DialogContent className="px-0">
-        <DialogHeader>
+        <DialogHeader className="px-6">
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
