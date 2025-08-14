@@ -47,7 +47,7 @@ export function DateTimePicker({ value, onChange }: DateTimePickerProps) {
             variant="outline"
             className="w-32 justify-between font-normal"
           >
-            {date ? format(date, "P") : "Select date"}
+            {date ? format(date, "dd/MM/yyyy") : "Select date"}
             <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
           </Button>
         </PopoverTrigger>

@@ -1,15 +1,23 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useState } from "react";
 
 import { GetClassSessionsSuccessResponseData } from "@/actions/types";
 import { SessionStatus } from "@/enums";
 import formatPrice from "@/lib/format-price";
 import { format } from "date-fns";
+import { CheckIcon, XIcon } from "lucide-react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
-import { ClassSessionDataType } from "../components/form/schema";
+import { ClassSessionDataType } from "../form/schema";
 import ClassSessionActions from "./ClassSessionActions";
 
 const StatusBadge: FC<{
@@ -59,10 +67,11 @@ const ClassSessionCard: FC<IClassSessionCardProps> = ({
   onDeleteClassSession,
   onFinishClassSession,
 }) => {
+  const [isFinishing, setIsFinishing] = useState(false);
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex min-h-9 items-center justify-between">
           <div className="flex items-center gap-2">
             <div
               className="h-3 w-3 rounded-full"
@@ -84,7 +93,6 @@ const ClassSessionCard: FC<IClassSessionCardProps> = ({
                 })
               }
               onDelete={() => onDeleteClassSession?.(classSession.id)}
-              onFinish={() => onFinishClassSession?.(classSession.id)}
             />
           )}
         </div>
@@ -109,13 +117,6 @@ const ClassSessionCard: FC<IClassSessionCardProps> = ({
             </span>
           </div>
 
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Status
-            </span>
-            <StatusBadge status={classSession.status} />
-          </div>
-
           {classSession.notes && (
             <div className="mt-4 rounded-lg border border-gray-100 bg-gray-50/50 p-3 dark:border-gray-700 dark:bg-gray-800/30">
               <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
@@ -132,6 +133,35 @@ const ClassSessionCard: FC<IClassSessionCardProps> = ({
           </div>
         </div>
       </CardContent>
+      <CardFooter>
+        {/* card footer for status and button finish class session */}
+        <div className="flex min-h-9 w-full items-center justify-between">
+          <StatusBadge status={classSession.status} />
+          {classSession.status !== SessionStatus.FINISHED &&
+            (isFinishing ? (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setIsFinishing(false)}
+                >
+                  <XIcon className="h-4 w-4" />
+                </Button>
+                <Button
+                  size={"icon"}
+                  onClick={() => onFinishClassSession?.(classSession.id)}
+                >
+                  <CheckIcon className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <Button onClick={() => setIsFinishing(true)}>
+                <CheckIcon />
+                Finish
+              </Button>
+            ))}
+        </div>
+      </CardFooter>
     </Card>
   );
 };

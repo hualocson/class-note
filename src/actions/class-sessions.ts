@@ -7,7 +7,8 @@ import { SessionStatus } from "@/enums/session-status";
 import { classSessionsTable } from "@/schemas/class-sessions";
 import { classesTable } from "@/schemas/classes";
 import { paymentsTable } from "@/schemas/payments";
-import { eq, getTableColumns, sql } from "drizzle-orm";
+import { endOfDay, startOfDay } from "date-fns";
+import { and, asc, between, eq, getTableColumns, sql } from "drizzle-orm";
 
 import {
   makeActionError,
@@ -104,8 +105,16 @@ export const deleteClassSession = async (id: string) => {
   }
 };
 
-export const getClassSessions = async () => {
+interface IGetClassSessions {
+  date: string;
+}
+
+export const getClassSessions = async (query?: IGetClassSessions) => {
   try {
+    // Calculate first time and last time of the day
+    const date = query?.date ? new Date(query.date) : undefined;
+    const start = date ? startOfDay(date) : undefined;
+    const end = date ? endOfDay(date) : undefined;
     const classSessions = await db
       .select({
         rowCount: sql<number>`count(*) over()`.mapWith(Number),
@@ -118,7 +127,15 @@ export const getClassSessions = async () => {
       })
       .from(classSessionsTable)
       .innerJoin(classesTable, eq(classSessionsTable.classId, classesTable.id))
-      .where(eq(classSessionsTable.isDeleted, false));
+      .where(
+        and(
+          eq(classSessionsTable.isDeleted, false),
+          start && end
+            ? between(classSessionsTable.date, start, end)
+            : undefined
+        )
+      )
+      .orderBy(asc(classSessionsTable.status), asc(classSessionsTable.date));
 
     return makeActionListSuccess({
       rows: classSessions,
