@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Edit, MoreHorizontal, Trash2 } from "lucide-react";
+import { Edit, MoreHorizontal, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,13 +14,11 @@ import {
 interface IClassSessionActionsProps {
   onEdit: () => void;
   onDelete: () => void;
-  onFinish: () => void;
 }
 
 const ClassSessionActions: React.FC<IClassSessionActionsProps> = ({
   onEdit,
   onDelete,
-  onFinish,
 }) => {
   return (
     <DropdownMenu>
@@ -33,10 +31,6 @@ const ClassSessionActions: React.FC<IClassSessionActionsProps> = ({
         <DropdownMenuItem onClick={onEdit}>
           <Edit className="h-4 w-4" />
           Edit
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={onFinish}>
-          <Check className="h-4 w-4" />
-          Finish
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-destructive" onClick={onDelete}>

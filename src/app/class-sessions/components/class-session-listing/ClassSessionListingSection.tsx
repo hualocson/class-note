@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { FC, useState } from "react";
 
 import { getClassSessions } from "@/actions/class-sessions";
 import useClassSessionActions from "@/hooks/useClassSessionActions";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import ClassSessionDialog from "../components/ClassSessionDialog";
-import { ClassSessionDataType } from "../components/form/schema";
+import ClassSessionDialog from "../ClassSessionDialog";
+import { ClassSessionDataType } from "../form/schema";
 import ClassSessionGrid from "./ClassSessionGrid";
 import ClassSessionHeader from "./ClassSessionHeader";
 
@@ -41,11 +41,19 @@ const LoadingState = () => {
   );
 };
 
-const ClassSessionListingSection = () => {
+interface IClassSessionListingSectionProps {
+  selectedDate: Date;
+}
+
+const ClassSessionListingSection: FC<IClassSessionListingSectionProps> = ({
+  selectedDate,
+}) => {
   const classSessionsQueryData = useQuery({
-    queryKey: ["class-sessions"],
+    queryKey: ["class-sessions", selectedDate.toISOString()],
     queryFn: async () => {
-      const result = await getClassSessions();
+      const result = await getClassSessions({
+        date: selectedDate.toISOString(),
+      });
 
       if (!result.success) {
         throw new Error(result.error || "Failed to fetch class sessions");
