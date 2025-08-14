@@ -27,17 +27,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Class Payment Tracker",
   description: "Track and manage your class payments efficiently",
-  viewport:
-    "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover",
-  themeColor: "#000000",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "Class Payment Tracker",
-  },
-  formatDetection: {
-    telephone: false,
-  },
 };
 
 export const viewport: Viewport = {
