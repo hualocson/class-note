@@ -2,6 +2,7 @@
 
 import { FC, useState } from "react";
 
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { startOfWeek } from "date-fns";
 
 import {
@@ -20,6 +21,7 @@ const MiniCalendarSection: FC<IMiniCalendarSectionProps> = ({
   selectedDate,
   onSelectedDateChange,
 }) => {
+  const isMobile = useIsMobile();
   const [startDate, setStartDate] = useState(
     startOfWeek(selectedDate, { weekStartsOn: 1 })
   );
@@ -37,7 +39,7 @@ const MiniCalendarSection: FC<IMiniCalendarSectionProps> = ({
       <MiniCalendar
         value={selectedDate}
         onValueChange={(date) => onSelectedDateChange(date ?? new Date())}
-        days={7}
+        days={isMobile ? 5 : 7}
         startDate={startDate}
         onStartDateChange={onStartDateChange}
       >
