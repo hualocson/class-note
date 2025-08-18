@@ -21,8 +21,9 @@ interface DateTimePickerProps {
 
 export function DateTimePicker({ value, onChange }: DateTimePickerProps) {
   const [date, setDate] = React.useState<Date | undefined>(value);
+  console.log({ value });
   const [time, setTime] = React.useState(
-    value ? format(value, "HH:mm:ss") : "00:00:00"
+    value ? format(value, "HH:mm:00") : "00:00:00"
   );
 
   // Merge date & time when either changes
@@ -61,7 +62,9 @@ export function DateTimePicker({ value, onChange }: DateTimePickerProps) {
         type="time"
         id="time-picker"
         step="1"
-        value={time}
+        defaultValue={
+          value ? format(value, "HH:mm:00") : format(new Date(), "HH:mm:00")
+        }
         onChange={(e) => setTime(e.target.value)}
         className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
       />
