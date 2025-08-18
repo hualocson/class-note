@@ -7,7 +7,9 @@ import { SessionStatus } from "@/enums/session-status";
 import { classSessionsTable } from "@/schemas/class-sessions";
 import { classesTable } from "@/schemas/classes";
 import { paymentsTable } from "@/schemas/payments";
-import { endOfDay, startOfDay } from "date-fns";
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import { and, asc, between, eq, getTableColumns, sql } from "drizzle-orm";
 
 import {
@@ -16,12 +18,28 @@ import {
   makeActionSuccess,
 } from "./utils";
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 export async function createClassSession(data: ClassSessionDataType) {
   try {
+    // Parse the date string and create a Date object in local timezone
+    const sessionDate = new Date(data.date);
+
+    // Ensure the date is treated as local time, not UTC
+    const localDate = new Date(
+      sessionDate.getFullYear(),
+      sessionDate.getMonth(),
+      sessionDate.getDate(),
+      sessionDate.getHours(),
+      sessionDate.getMinutes(),
+      sessionDate.getSeconds()
+    );
+
     const [newClassSession] = await db
       .insert(classSessionsTable)
       .values({
-        date: new Date(data.date),
+        date: localDate,
         classId: data.classId,
         fee: data.fee,
         notes: data.notes,
@@ -50,8 +68,19 @@ export const updateClassSession = async (
         date: Date;
       }
     > = {};
+
     if (data.date) {
-      updateData.date = new Date(data.date);
+      // Parse the date string and create a Date object in local timezone
+      const sessionDate = new Date(data.date);
+      const localDate = new Date(
+        sessionDate.getFullYear(),
+        sessionDate.getMonth(),
+        sessionDate.getDate(),
+        sessionDate.getHours(),
+        sessionDate.getMinutes(),
+        sessionDate.getSeconds()
+      );
+      updateData.date = localDate;
     }
     if (data.classId) {
       updateData.classId = data.classId;
@@ -111,10 +140,57 @@ interface IGetClassSessions {
 
 export const getClassSessions = async (query?: IGetClassSessions) => {
   try {
-    // Calculate first time and last time of the day
-    const date = query?.date ? new Date(query.date) : undefined;
-    const start = date ? startOfDay(date) : undefined;
-    const end = date ? endOfDay(date) : undefined;
+    // Calculate first time and last time of the day in local timezone
+    const date = query?.date ? dayjs(query.date) : undefined;
+
+    if (date) {
+      // Ensure we're working with local dates, not UTC
+      const localDate = date.tz("Asia/Ho_Chi_Minh").format("YYYY-MM-DD");
+
+      const localStartOfDay = dayjs(localDate)
+        .set("hour", 0)
+        .set("minute", 0)
+        .set("second", 0);
+      const localEndOfDay = dayjs(localDate)
+        .set("hour", 23)
+        .set("minute", 59)
+        .set("second", 59); // timezone vn
+
+      const utcStartOfDay = dayjs(localStartOfDay).utc().toDate();
+
+      const utcEndOfDay = dayjs(localEndOfDay).utc().toDate();
+
+      const classSessions = await db
+        .select({
+          rowCount: sql<number>`count(*) over()`.mapWith(Number),
+          ...getTableColumns(classSessionsTable),
+          class: {
+            name: classesTable.name,
+            code: classesTable.code,
+            color: classesTable.color,
+          },
+        })
+        .from(classSessionsTable)
+        .innerJoin(
+          classesTable,
+          eq(classSessionsTable.classId, classesTable.id)
+        )
+        .where(
+          and(
+            eq(classSessionsTable.isDeleted, false),
+            utcStartOfDay && utcEndOfDay
+              ? between(classSessionsTable.date, utcStartOfDay, utcEndOfDay)
+              : undefined
+          )
+        )
+        .orderBy(asc(classSessionsTable.status), asc(classSessionsTable.date));
+
+      return makeActionListSuccess({
+        rows: classSessions,
+        rowCount: classSessions.length > 0 ? classSessions[0].rowCount : 0,
+      });
+    }
+
     const classSessions = await db
       .select({
         rowCount: sql<number>`count(*) over()`.mapWith(Number),
@@ -127,14 +203,7 @@ export const getClassSessions = async (query?: IGetClassSessions) => {
       })
       .from(classSessionsTable)
       .innerJoin(classesTable, eq(classSessionsTable.classId, classesTable.id))
-      .where(
-        and(
-          eq(classSessionsTable.isDeleted, false),
-          start && end
-            ? between(classSessionsTable.date, start, end)
-            : undefined
-        )
-      )
+      .where(and(eq(classSessionsTable.isDeleted, false)))
       .orderBy(asc(classSessionsTable.status), asc(classSessionsTable.date));
 
     return makeActionListSuccess({
