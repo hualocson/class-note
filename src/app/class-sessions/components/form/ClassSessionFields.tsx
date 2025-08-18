@@ -71,7 +71,23 @@ const ClassSessionFields = ({ form }: IClassSessionFieldsProps) => {
             <FormLabel>Start session time *</FormLabel>
             <DateTimePicker
               value={field.value ? new Date(field.value) : undefined}
-              onChange={(date) => field.onChange(date?.toISOString())}
+              onChange={(date) => {
+                // Preserve local timezone by creating a date string that includes timezone offset
+                if (date) {
+                  const year = date.getFullYear();
+                  const month = String(date.getMonth() + 1).padStart(2, "0");
+                  const day = String(date.getDate()).padStart(2, "0");
+                  const hours = String(date.getHours()).padStart(2, "0");
+                  const minutes = String(date.getMinutes()).padStart(2, "0");
+                  const seconds = String(date.getSeconds()).padStart(2, "0");
+
+                  // Create ISO-like string but preserve local timezone
+                  const localDateString = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+                  field.onChange(localDateString);
+                } else {
+                  field.onChange(undefined);
+                }
+              }}
             />
             <FormMessage />
           </FormItem>

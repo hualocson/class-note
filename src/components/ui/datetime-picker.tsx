@@ -61,9 +61,7 @@ export function DateTimePicker({ value, onChange }: DateTimePickerProps) {
         type="time"
         id="time-picker"
         step="1"
-        defaultValue={
-          value ? format(value, "HH:mm:00") : format(new Date(), "HH:mm:00")
-        }
+        value={time}
         onChange={(e) => setTime(e.target.value)}
         className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
       />
