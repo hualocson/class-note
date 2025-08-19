@@ -1,16 +1,13 @@
 "use server";
 
 import { ClassSessionDataType } from "@/app/class-sessions/components/form/schema";
+import dayjs from "@/configs/dayjs";
 import { db } from "@/db";
 import { PaymentStatus } from "@/enums";
 import { SessionStatus } from "@/enums/session-status";
-import { formatServerDate } from "@/lib/format-date";
 import { classSessionsTable } from "@/schemas/class-sessions";
 import { classesTable } from "@/schemas/classes";
 import { paymentsTable } from "@/schemas/payments";
-import dayjs from "dayjs";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
 import { and, asc, between, eq, getTableColumns, sql } from "drizzle-orm";
 
 import {
@@ -19,26 +16,15 @@ import {
   makeActionSuccess,
 } from "./utils";
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
 export async function createClassSession(data: ClassSessionDataType) {
   try {
     // Parse the date string from VN timezone and convert to UTC for server storage
     const sessionDate = new Date(data.date);
-    const localDate = new Date(
-      sessionDate.getFullYear(),
-      sessionDate.getMonth(),
-      sessionDate.getDate(),
-      sessionDate.getHours(),
-      sessionDate.getMinutes(),
-      sessionDate.getSeconds()
-    );
 
     const [newClassSession] = await db
       .insert(classSessionsTable)
       .values({
-        date: localDate,
+        date: sessionDate,
         classId: data.classId,
         fee: data.fee,
         notes: data.notes,
@@ -69,17 +55,7 @@ export const updateClassSession = async (
     > = {};
 
     if (data.date) {
-      // Parse the date string and create a Date object in local timezone
-      const sessionDate = new Date(data.date);
-      const localDate = new Date(
-        sessionDate.getFullYear(),
-        sessionDate.getMonth(),
-        sessionDate.getDate(),
-        sessionDate.getHours(),
-        sessionDate.getMinutes(),
-        sessionDate.getSeconds()
-      );
-      updateData.date = localDate;
+      updateData.date = new Date(data.date);
     }
     if (data.classId) {
       updateData.classId = data.classId;
@@ -144,7 +120,7 @@ export const getClassSessions = async (query?: IGetClassSessions) => {
 
     if (date) {
       // Ensure we're working with local dates, not UTC
-      const localDate = date.tz("Asia/Ho_Chi_Minh").format("YYYY-MM-DD");
+      const localDate = date.format("YYYY-MM-DD");
 
       const localStartOfDay = dayjs(localDate)
         .set("hour", 0)
@@ -254,7 +230,7 @@ export const finishClassSession = async (id: string) => {
           sessionId: id,
           amount: currentSession.fee,
           status: PaymentStatus.PENDING,
-          notes: `Payment for session on ${formatServerDate(currentSession.date).format("DD/MM/YYYY HH:mm")}`,
+          notes: `Payment for session on ${dayjs(currentSession.date).format("DD/MM/YYYY HH:mm")}`,
         })
         .returning(),
     ]);

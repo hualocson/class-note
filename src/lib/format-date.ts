@@ -1,12 +1,7 @@
-import dayjs from "dayjs";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
+import dayjs from "@/configs/dayjs";
 
 const formatDate = (date: Date) => {
-  const localDate = dayjs(date).utc(true).toDate();
+  const localDate = dayjs(date).toDate();
   return new Intl.DateTimeFormat("vi-VN", {
     year: "numeric",
     month: "long",
@@ -15,7 +10,8 @@ const formatDate = (date: Date) => {
 };
 
 export const formatServerDate = (date: string | Date) => {
-  return dayjs(date).utc(true);
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  return dayjs.utc(date).tz(tz);
 };
 
 export default formatDate;

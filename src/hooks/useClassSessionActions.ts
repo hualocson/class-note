@@ -5,6 +5,7 @@ import {
   updateClassSession,
 } from "@/actions/class-sessions";
 import { ClassSessionDataType } from "@/app/class-sessions/components/form/schema";
+import dayjs from "@/configs/dayjs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -12,7 +13,10 @@ const useClassSessionActions = () => {
   const queryClient = useQueryClient();
   const createClassSessionMutation = useMutation({
     mutationFn: async (data: ClassSessionDataType) => {
-      const result = await createClassSession(data);
+      const result = await createClassSession({
+        ...data,
+        date: dayjs(data.date).utc().toISOString(),
+      });
 
       if (!result.success) {
         throw new Error(result.error || "Failed to create class session");
@@ -36,7 +40,10 @@ const useClassSessionActions = () => {
       id: string;
       data: Partial<ClassSessionDataType>;
     }) => {
-      const result = await updateClassSession(id, data);
+      const result = await updateClassSession(id, {
+        ...data,
+        date: dayjs(data.date).utc().toISOString(),
+      });
 
       if (!result.success) {
         throw new Error(result.error || "Failed to create class session");
