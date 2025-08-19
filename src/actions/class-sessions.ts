@@ -113,16 +113,14 @@ interface IGetClassSessions {
   date: string;
 }
 
-// query date format DD/MM/YYYY
 export const getClassSessions = async (query?: IGetClassSessions) => {
   try {
     // Calculate first time and last time of the day in local timezone
 
     if (query?.date) {
-      const vnTz = "Asia/Ho_Chi_Minh";
-
       // Parse dd/MM/YYYY explicitly in VN timezone
-      const parsedDate = dayjs.tz(query?.date, "DD/MM/YYYY", vnTz);
+      const parsedDate = dayjs(query.date);
+
       // Ensure we're working with local dates, not UTC
       // Build day boundaries
       const startOfDay = parsedDate.startOf("day"); // 2025-08-18 00:00 +07:00
