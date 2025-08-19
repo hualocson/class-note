@@ -119,16 +119,13 @@ export const getClassSessions = async (query?: IGetClassSessions) => {
 
     if (query?.date) {
       // Parse dd/MM/YYYY explicitly in VN timezone
-      const parsedDate = dayjs(query.date);
+      const startOfDay = dayjs(query.date);
 
-      // Ensure we're working with local dates, not UTC
-      // Build day boundaries
-      const startOfDay = parsedDate.startOf("day"); // 2025-08-18 00:00 +07:00
-      const endOfDay = parsedDate.endOf("day"); // 2025-08-18 23:59:59 +07:00
-
-      // Convert to UTC for DB query
-      const utcStartOfDay = startOfDay.utc().toDate(); // 2025-08-17 17:00:00Z
-      const utcEndOfDay = endOfDay.utc().toDate(); // 2025-08-18 16:59:59Z
+      // plus to 23:59:59
+      const endOfDay = startOfDay
+        .add(23, "hour")
+        .add(59, "minute")
+        .add(59, "second");
 
       const classSessions = await db
         .select({
@@ -148,8 +145,12 @@ export const getClassSessions = async (query?: IGetClassSessions) => {
         .where(
           and(
             eq(classSessionsTable.isDeleted, false),
-            utcStartOfDay && utcEndOfDay
-              ? between(classSessionsTable.date, utcStartOfDay, utcEndOfDay)
+            startOfDay && endOfDay
+              ? between(
+                  classSessionsTable.date,
+                  startOfDay.toDate(),
+                  endOfDay.toDate()
+                )
               : undefined
           )
         )
