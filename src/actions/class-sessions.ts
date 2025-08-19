@@ -113,27 +113,24 @@ interface IGetClassSessions {
   date: string;
 }
 
+// query date format DD/MM/YYYY
 export const getClassSessions = async (query?: IGetClassSessions) => {
   try {
     // Calculate first time and last time of the day in local timezone
-    const date = query?.date ? dayjs(query.date) : undefined;
 
-    if (date) {
+    if (query?.date) {
+      const vnTz = "Asia/Ho_Chi_Minh";
+
+      // Parse dd/MM/YYYY explicitly in VN timezone
+      const parsedDate = dayjs.tz(query?.date, "DD/MM/YYYY", vnTz);
       // Ensure we're working with local dates, not UTC
-      const localDate = date.format("YYYY-MM-DD");
+      // Build day boundaries
+      const startOfDay = parsedDate.startOf("day"); // 2025-08-18 00:00 +07:00
+      const endOfDay = parsedDate.endOf("day"); // 2025-08-18 23:59:59 +07:00
 
-      const localStartOfDay = dayjs(localDate)
-        .set("hour", 0)
-        .set("minute", 0)
-        .set("second", 0);
-      const localEndOfDay = dayjs(localDate)
-        .set("hour", 23)
-        .set("minute", 59)
-        .set("second", 59); // timezone vn
-
-      const utcStartOfDay = dayjs(localStartOfDay).utc().toDate();
-
-      const utcEndOfDay = dayjs(localEndOfDay).utc().toDate();
+      // Convert to UTC for DB query
+      const utcStartOfDay = startOfDay.utc().toDate(); // 2025-08-17 17:00:00Z
+      const utcEndOfDay = endOfDay.utc().toDate(); // 2025-08-18 16:59:59Z
 
       const classSessions = await db
         .select({
