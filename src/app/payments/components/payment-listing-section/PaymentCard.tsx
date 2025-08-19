@@ -1,9 +1,12 @@
 "use client";
 
-import formatDate from "@/lib/format-date";
+import { formatServerDate } from "@/lib/format-date";
 import formatPrice from "@/lib/format-price";
 import { SelectClassType } from "@/schemas/classes";
 import { type SelectPayment } from "@/schemas/payments";
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -16,6 +19,9 @@ import {
 
 import { PaymentDataType } from "../form/schema";
 import PaymentActions from "./PaymentActions";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 interface PaymentCardProps {
   payment: SelectPayment & {
@@ -68,7 +74,7 @@ const PaymentCard: React.FC<PaymentCardProps> = ({
     onEdit({
       id: payment.id,
       data: {
-        date: payment.date.toISOString(),
+        date: dayjs(payment.date).utc(true).toISOString(),
         classId: payment.classId,
         amount: payment.amount,
         status: payment.status,
@@ -103,7 +109,7 @@ const PaymentCard: React.FC<PaymentCardProps> = ({
               {formatPrice(payment.amount)}
             </CardTitle>
             <CardDescription className="flex flex-col gap-1 text-sm font-medium text-gray-600 dark:text-gray-400">
-              {formatDate(new Date(payment.date))}
+              {formatServerDate(payment.date).format("DD/MM/YYYY")}
               {getStatusBadge(payment.status)}
             </CardDescription>
           </div>
