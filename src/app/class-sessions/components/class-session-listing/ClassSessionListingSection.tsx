@@ -3,6 +3,7 @@
 import { FC, useState } from "react";
 
 import { getClassSessions } from "@/actions/class-sessions";
+import dayjs from "@/configs/dayjs";
 import useClassSessionActions from "@/hooks/useClassSessionActions";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -52,7 +53,7 @@ const ClassSessionListingSection: FC<IClassSessionListingSectionProps> = ({
     queryKey: ["class-sessions", selectedDate.toISOString()],
     queryFn: async () => {
       const result = await getClassSessions({
-        date: selectedDate.toISOString(),
+        date: dayjs(selectedDate).format("DD/MM/YYYY"),
       });
 
       if (!result.success) {
