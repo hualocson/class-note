@@ -4,6 +4,7 @@ import { ClassSessionDataType } from "@/app/class-sessions/components/form/schem
 import { db } from "@/db";
 import { PaymentStatus } from "@/enums";
 import { SessionStatus } from "@/enums/session-status";
+import { formatServerDate } from "@/lib/format-date";
 import { classSessionsTable } from "@/schemas/class-sessions";
 import { classesTable } from "@/schemas/classes";
 import { paymentsTable } from "@/schemas/payments";
@@ -23,10 +24,8 @@ dayjs.extend(timezone);
 
 export async function createClassSession(data: ClassSessionDataType) {
   try {
-    // Parse the date string and create a Date object in local timezone
+    // Parse the date string from VN timezone and convert to UTC for server storage
     const sessionDate = new Date(data.date);
-
-    // Ensure the date is treated as local time, not UTC
     const localDate = new Date(
       sessionDate.getFullYear(),
       sessionDate.getMonth(),
@@ -255,7 +254,7 @@ export const finishClassSession = async (id: string) => {
           sessionId: id,
           amount: currentSession.fee,
           status: PaymentStatus.PENDING,
-          notes: `Payment for session on ${new Date(currentSession.date).toLocaleDateString()}`,
+          notes: `Payment for session on ${formatServerDate(currentSession.date).format("DD/MM/YYYY HH:mm")}`,
         })
         .returning(),
     ]);

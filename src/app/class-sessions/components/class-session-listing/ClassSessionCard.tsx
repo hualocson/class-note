@@ -5,7 +5,9 @@ import { FC, useState } from "react";
 import { GetClassSessionsSuccessResponseData } from "@/actions/types";
 import { SessionStatus } from "@/enums";
 import formatPrice from "@/lib/format-price";
-import { format } from "date-fns";
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import { CheckIcon, XIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -19,6 +21,9 @@ import {
 
 import { ClassSessionDataType } from "../form/schema";
 import ClassSessionActions from "./ClassSessionActions";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const StatusBadge: FC<{
   status: SessionStatus;
@@ -86,7 +91,9 @@ const ClassSessionCard: FC<IClassSessionCardProps> = ({
                   id: classSession.id,
                   data: {
                     classId: classSession.classId,
-                    date: classSession.date.toISOString(),
+                    date: dayjs(classSession.date)
+                      .utc(true)
+                      .format("YYYY-MM-DD HH:mm:ss"),
                     fee: classSession.fee,
                     notes: classSession.notes || undefined,
                   },
@@ -104,7 +111,7 @@ const ClassSessionCard: FC<IClassSessionCardProps> = ({
               Session Date
             </span>
             <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-              {format(new Date(classSession.date), "dd/MM/yyyy HH:mm")}
+              {dayjs(classSession.date).utc(true).format("DD/MM/YYYY HH:mm")}
             </span>
           </div>
 
