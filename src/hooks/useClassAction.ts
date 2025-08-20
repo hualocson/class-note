@@ -1,7 +1,7 @@
 "use client";
 
 import { createClass, deleteClass, updateClass } from "@/actions/classes";
-import { ClassDataType } from "@/app/classes/components/form/schema";
+import { ClassDataType } from "@/app/(protected)/classes/components/form/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 

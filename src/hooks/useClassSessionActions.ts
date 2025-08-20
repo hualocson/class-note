@@ -4,7 +4,7 @@ import {
   finishClassSession,
   updateClassSession,
 } from "@/actions/class-sessions";
-import { ClassSessionDataType } from "@/app/class-sessions/components/form/schema";
+import { ClassSessionDataType } from "@/app/(protected)/class-sessions/components/form/schema";
 import dayjs from "@/configs/dayjs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";

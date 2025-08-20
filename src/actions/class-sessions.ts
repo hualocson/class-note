@@ -1,6 +1,6 @@
 "use server";
 
-import { ClassSessionDataType } from "@/app/class-sessions/components/form/schema";
+import { ClassSessionDataType } from "@/app/(protected)/class-sessions/components/form/schema";
 import dayjs from "@/configs/dayjs";
 import { db } from "@/db";
 import { PaymentStatus } from "@/enums";
