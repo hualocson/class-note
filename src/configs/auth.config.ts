@@ -23,4 +23,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   jwt: {
     maxAge: 60 * 60 * 24 * 30, // 30 days
   },
+  callbacks: {
+    signIn: async ({ user }) => {
+      const email = user.email;
+      const whiteList = process.env.EMAIL_WHITELIST?.split("|") ?? [];
+      console.log({ email, whiteList });
+      if (!email || whiteList.length === 0) {
+        return false;
+      }
+      return whiteList.includes(email);
+    },
+  },
 });
