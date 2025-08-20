@@ -4,7 +4,7 @@ import { usersTable } from "@/schemas/users";
 import { verificationTokensTable } from "@/schemas/verificationTokens";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import NextAuth from "next-auth";
-import Resend from "next-auth/providers/resend";
+import Nodemailer from "next-auth/providers/nodemailer";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db, {
@@ -13,8 +13,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     verificationTokensTable,
   }),
   providers: [
-    Resend({
-      apiKey: process.env.RESEND_API_KEY,
+    Nodemailer({
+      server: {
+        host: process.env.EMAIL_SERVER_HOST,
+        port: process.env.EMAIL_SERVER_PORT,
+        auth: {
+          user: process.env.EMAIL_SERVER_USER,
+          pass: process.env.EMAIL_SERVER_PASSWORD,
+        },
+      },
       from: process.env.EMAIL_FROM,
     }),
   ],
@@ -27,7 +34,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: async ({ user }) => {
       const email = user.email;
       const whiteList = process.env.EMAIL_WHITELIST?.split("|") ?? [];
-      console.log({ email, whiteList });
       if (!email || whiteList.length === 0) {
         return false;
       }
