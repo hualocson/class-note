@@ -2,14 +2,14 @@ import { HomeIcon } from "lucide-react";
 
 import PageHeader from "@/components/common/PageHeader";
 
-import ClassPaymentsStatsGrid from "./components/ClassPaymentsStatsGrid";
+import ClassPaymentsStatsGrid from "../components/ClassPaymentsStatsGrid";
 
 export default function Home() {
   return (
     <div className="bg-background text-foreground">
       {/* Reusable Header */}
       <PageHeader
-        title="Class Payment Tracker"
+        title={`Class Payment Tracker`}
         icon={<HomeIcon className="text-primary h-6 w-6" />}
       />
 
