@@ -20,6 +20,7 @@ interface IGroupGridProps {
   onDeleteClassSession?: (id: string) => void;
   onFinishClassSession?: (id: string) => void;
   renderEmptyState: () => React.ReactNode;
+  finishingClassSessionIds: string[];
 }
 
 const GroupGrid: FC<IGroupGridProps> = ({
@@ -30,6 +31,7 @@ const GroupGrid: FC<IGroupGridProps> = ({
   onDeleteClassSession,
   onFinishClassSession,
   renderEmptyState,
+  finishingClassSessionIds,
 }) => {
   const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search);
@@ -73,6 +75,9 @@ const GroupGrid: FC<IGroupGridProps> = ({
               onEditClassSession={onEditClassSession}
               onDeleteClassSession={onDeleteClassSession}
               onFinishClassSession={onFinishClassSession}
+              isLoadingFinish={finishingClassSessionIds.includes(
+                classSession.id
+              )}
             />
           ))}
         </div>

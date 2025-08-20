@@ -25,6 +25,7 @@ interface IClassSessionGridProps {
   }) => void;
   onDeleteClassSession?: (id: string) => void;
   onFinishClassSession?: (id: string) => void;
+  finishingClassSessionIds: string[];
 }
 
 const ClassSessionGrid: FC<IClassSessionGridProps> = ({
@@ -32,6 +33,7 @@ const ClassSessionGrid: FC<IClassSessionGridProps> = ({
   onEditClassSession,
   onDeleteClassSession,
   onFinishClassSession,
+  finishingClassSessionIds,
 }) => {
   // grouping by date (upcoming, past) use date-fns Record<"upcoming" | "past", ClassSessionDataType[]>
   const groupedClassSessions = classSessions.rows.reduce(
@@ -59,6 +61,7 @@ const ClassSessionGrid: FC<IClassSessionGridProps> = ({
         onDeleteClassSession={onDeleteClassSession}
         onFinishClassSession={onFinishClassSession}
         renderEmptyState={() => <EmptyState />}
+        finishingClassSessionIds={finishingClassSessionIds}
       />
 
       <GroupGrid
@@ -69,6 +72,7 @@ const ClassSessionGrid: FC<IClassSessionGridProps> = ({
         onDeleteClassSession={onDeleteClassSession}
         onFinishClassSession={onFinishClassSession}
         renderEmptyState={() => <EmptyState />}
+        finishingClassSessionIds={finishingClassSessionIds}
       />
     </div>
   ) : (
