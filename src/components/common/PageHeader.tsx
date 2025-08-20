@@ -1,7 +1,10 @@
-import { ReactNode } from "react";
+"use client";
 
+import { ReactNode, useState } from "react";
+
+import { signOutAction } from "@/actions/auth";
 import { cn } from "@/lib/utils";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, Loader2, LogOutIcon } from "lucide-react";
 
 import { Button } from "../ui/button";
 import ThemeToggleButton from "./ThemeToggleButton";
@@ -21,6 +24,12 @@ export default function PageHeader({
   className = "",
   onBack,
 }: PageHeaderProps) {
+  const [loading, setLoading] = useState(false);
+  const handleSignOut = async () => {
+    setLoading(true);
+    await signOutAction();
+    setLoading(false);
+  };
   return (
     <header
       className={cn(
@@ -41,7 +50,17 @@ export default function PageHeader({
 
         <div className="flex items-center gap-2">
           {children}
-          <ThemeToggleButton />
+          <div className="flex items-center gap-2">
+            <ThemeToggleButton />
+            <Button
+              variant="ghost"
+              size={"icon"}
+              onClick={handleSignOut}
+              disabled={loading}
+            >
+              {loading ? <Loader2 className="animate-spin" /> : <LogOutIcon />}
+            </Button>
+          </div>
         </div>
       </div>
     </header>
