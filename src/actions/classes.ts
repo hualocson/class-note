@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import {
   type ClassDataType,
   classSchema,
-} from "@/app/classes/components/form/schema";
+} from "@/app/(protected)/classes/components/form/schema";
 import { db } from "@/db";
 import { SelectClassType, classesTable } from "@/schemas/classes";
 import { eq, isNull } from "drizzle-orm";
