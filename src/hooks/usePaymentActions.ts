@@ -5,7 +5,7 @@ import {
   deletePayment,
   updatePayment,
 } from "@/actions/payments";
-import { PaymentDataType } from "@/app/payments/components/form/schema";
+import { PaymentDataType } from "@/app/(protected)/payments/components/form/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
