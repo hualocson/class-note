@@ -208,6 +208,8 @@ export const finishClassSession = async (id: string) => {
       return makeActionError("Only planned sessions can be marked as finished");
     }
 
+    const clientDate = dayjs(currentSession.date).tz("Asia/Ho_Chi_Minh");
+
     // Use a transaction to ensure both operations succeed or fail together
     const result = await db.batch([
       db
@@ -226,7 +228,7 @@ export const finishClassSession = async (id: string) => {
           sessionId: id,
           amount: currentSession.fee,
           status: PaymentStatus.PENDING,
-          notes: `Payment for session on ${dayjs(currentSession.date).format("DD/MM/YYYY HH:mm")}`,
+          notes: `Payment for session on ${clientDate.format("DD/MM/YYYY HH:mm")}`,
         })
         .returning(),
     ]);

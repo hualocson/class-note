@@ -63,6 +63,10 @@ const ClassSessionListingSection: FC<IClassSessionListingSectionProps> = ({
     },
   });
 
+  const [finishingClassSessionIds, setFinishingClassSessionIds] = useState<
+    string[]
+  >([]);
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedClassSession, setSelectedClassSession] = useState<{
     id?: string;
@@ -72,32 +76,50 @@ const ClassSessionListingSection: FC<IClassSessionListingSectionProps> = ({
     useClassSessionActions();
 
   const handleDeleteClassSession = (id: string) => {
+    const toastId = toast.loading("Deleting class session...");
     deleteClassSessionMutation.mutate(id, {
       onSuccess: () => {
         classSessionsQueryData.refetch();
-        toast.success("Class session deleted successfully");
+        toast.success("Class session deleted successfully", {
+          id: toastId,
+        });
       },
       onError: (error) => {
         if (error instanceof Error) {
-          toast.error(error.message);
+          toast.error(error.message, {
+            id: toastId,
+          });
         } else {
-          toast.error("Failed to delete class session");
+          toast.error("Failed to delete class session", {
+            id: toastId,
+          });
         }
       },
     });
   };
 
   const handleFinishClassSession = (id: string) => {
+    setFinishingClassSessionIds((prev) => [...prev, id]);
+    const toastId = toast.loading("Finishing class session...");
     finishClassSessionMutation.mutate(id, {
       onSuccess: () => {
-        toast.success("Class session finished successfully");
+        toast.success("Class session finished successfully", {
+          id: toastId,
+        });
       },
       onError: (error) => {
         if (error instanceof Error) {
-          toast.error(error.message);
+          toast.error(error.message, {
+            id: toastId,
+          });
         } else {
-          toast.error("Failed to finish class session");
+          toast.error("Failed to finish class session", {
+            id: toastId,
+          });
         }
+      },
+      onSettled: () => {
+        setFinishingClassSessionIds((prev) => prev.filter((id) => id !== id));
       },
     });
   };
@@ -132,6 +154,7 @@ const ClassSessionListingSection: FC<IClassSessionListingSectionProps> = ({
             onEditClassSession={handleEditClassSession}
             onDeleteClassSession={handleDeleteClassSession}
             onFinishClassSession={handleFinishClassSession}
+            finishingClassSessionIds={finishingClassSessionIds}
           />
         )}
       </section>

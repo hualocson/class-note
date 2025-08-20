@@ -3,12 +3,11 @@
 import { FC, useState } from "react";
 
 import { GetClassSessionsSuccessResponseData } from "@/actions/types";
+import dayjs from "@/configs/dayjs";
 import { SessionStatus } from "@/enums";
+import { formatServerDate } from "@/lib/format-date";
 import formatPrice from "@/lib/format-price";
-import dayjs from "dayjs";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
-import { CheckIcon, XIcon } from "lucide-react";
+import { CheckIcon, Loader2Icon, XIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,9 +20,6 @@ import {
 
 import { ClassSessionDataType } from "../form/schema";
 import ClassSessionActions from "./ClassSessionActions";
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 const StatusBadge: FC<{
   status: SessionStatus;
@@ -64,6 +60,7 @@ interface IClassSessionCardProps {
   }) => void;
   onDeleteClassSession?: (id: string) => void;
   onFinishClassSession?: (id: string) => void;
+  isLoadingFinish?: boolean;
 }
 
 const ClassSessionCard: FC<IClassSessionCardProps> = ({
@@ -71,6 +68,7 @@ const ClassSessionCard: FC<IClassSessionCardProps> = ({
   onEditClassSession,
   onDeleteClassSession,
   onFinishClassSession,
+  isLoadingFinish,
 }) => {
   const [isFinishing, setIsFinishing] = useState(false);
   return (
@@ -91,9 +89,7 @@ const ClassSessionCard: FC<IClassSessionCardProps> = ({
                   id: classSession.id,
                   data: {
                     classId: classSession.classId,
-                    date: dayjs(classSession.date)
-                      .utc(true)
-                      .format("YYYY-MM-DD HH:mm:ss"),
+                    date: dayjs(classSession.date).toISOString(),
                     fee: classSession.fee,
                     notes: classSession.notes || undefined,
                   },
@@ -111,7 +107,7 @@ const ClassSessionCard: FC<IClassSessionCardProps> = ({
               Session Date
             </span>
             <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-              {dayjs(classSession.date).utc(true).format("DD/MM/YYYY HH:mm")}
+              {formatServerDate(classSession.date).format("DD/MM/YYYY HH:mm")}
             </span>
           </div>
 
@@ -151,14 +147,20 @@ const ClassSessionCard: FC<IClassSessionCardProps> = ({
                   variant="outline"
                   size="icon"
                   onClick={() => setIsFinishing(false)}
+                  disabled={isLoadingFinish}
                 >
                   <XIcon className="h-4 w-4" />
                 </Button>
                 <Button
                   size={"icon"}
                   onClick={() => onFinishClassSession?.(classSession.id)}
+                  disabled={isLoadingFinish}
                 >
-                  <CheckIcon className="h-4 w-4" />
+                  {isLoadingFinish ? (
+                    <Loader2Icon className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <CheckIcon className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             ) : (
