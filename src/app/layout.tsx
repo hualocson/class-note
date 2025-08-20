@@ -3,7 +3,6 @@ import { Geist_Mono, Montserrat } from "next/font/google";
 
 import { cn } from "@/lib/utils";
 
-import BottomNavigation from "@/components/navigation/BottomNavigation";
 import Providers from "@/components/providers";
 
 import "./globals.css";
@@ -57,10 +56,7 @@ export default function RootLayout({
       >
         <Providers>
           {/* Main content with bottom padding for navigation */}
-          <main className="pb-20">{children}</main>
-
-          {/* Bottom Navigation - always visible */}
-          <BottomNavigation />
+          <main>{children}</main>
         </Providers>
       </body>
     </html>
