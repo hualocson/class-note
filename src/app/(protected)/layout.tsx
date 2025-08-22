@@ -14,6 +14,7 @@ export default async function ProtectedLayout({
   if (!session) {
     redirect("/sign-in");
   }
+
   return (
     <SessionProvider>
       <div className="pb-20">{children}</div>

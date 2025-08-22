@@ -14,7 +14,7 @@ export default async function AuthLayout({
     redirect("/");
   }
   return (
-    <div className="flex min-h-svh items-center justify-center px-3 md:px-4">
+    <div className="flex items-center justify-center px-3 py-24 md:px-4">
       {children}
     </div>
   );
