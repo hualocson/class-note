@@ -1,40 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useTransition } from "react";
 
-import { signInAction } from "@/actions/auth";
-import { Loader2, LogInIcon, MailIcon, ShellIcon } from "lucide-react";
+import { Loader2Icon, LogInIcon, ShellIcon } from "lucide-react";
 import { signIn } from "next-auth/react";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 const SignInForm = () => {
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) {
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await signInAction(email);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to sign in");
-    } finally {
-      setLoading(false);
-    }
+  const [isPending, startTransition] = useTransition();
+  const handleSignIn = () => {
+    startTransition(async () => {
+      await signIn("google");
+    });
   };
-
   return (
-    <div className="mx-auto w-full max-w-md py-12">
-      <div className="space-y-8">
+    <div className="mx-auto w-full max-w-sm">
+      <div className="space-y-6">
         {/* Header */}
         <div className="space-y-2 text-center">
           <div className="bg-primary/10 mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full">
@@ -49,64 +31,19 @@ const SignInForm = () => {
         </div>
 
         {/* Form */}
-        <div className="bg-card border-border rounded-lg border p-6 shadow-sm">
-          <form onSubmit={handleSignIn} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium">
-                Email address
-              </Label>
-              <div className="relative">
-                <MailIcon className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="h-11 pl-10"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <Button
-                type="submit"
-                disabled={loading || !email.trim()}
-                className="h-11 w-full font-medium"
-                size="lg"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
-                  </>
-                ) : (
-                  <>
-                    <LogInIcon className="mr-2 h-4 w-4" />
-                    Sign in with Email
-                  </>
-                )}
-              </Button>
-              <Button
-                type="button"
-                onClick={() => signIn("google")}
-                className="h-11 w-full font-medium"
-                size="lg"
-              >
-                <LogInIcon className="mr-2 h-4 w-4" />
-                Sign in with Google
-              </Button>
-            </div>
-          </form>
-        </div>
-
-        {/* Footer */}
-        <div className="text-center">
-          <p className="text-muted-foreground text-sm">
-            {"We'll send you a magic link to sign in securely"}
-          </p>
-        </div>
+        <Button
+          type="button"
+          onClick={handleSignIn}
+          disabled={isPending}
+          className="h-11 w-full font-medium"
+        >
+          {isPending ? (
+            <Loader2Icon className="h-4 w-4 animate-spin" />
+          ) : (
+            <LogInIcon className="h-4 w-4" />
+          )}
+          Sign in with Google
+        </Button>
       </div>
     </div>
   );
