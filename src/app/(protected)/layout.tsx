@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { auth } from "@/configs/auth.config";
+import { SessionProvider } from "next-auth/react";
 
 import BottomNavigation from "@/components/navigation/BottomNavigation";
 
@@ -14,10 +15,10 @@ export default async function ProtectedLayout({
     redirect("/sign-in");
   }
   return (
-    <>
+    <SessionProvider>
       <div className="pb-20">{children}</div>
       {/* Bottom Navigation - always visible */}
       <BottomNavigation />
-    </>
+    </SessionProvider>
   );
 }
