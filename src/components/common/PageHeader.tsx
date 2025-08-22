@@ -2,9 +2,9 @@
 
 import { ReactNode, useState } from "react";
 
-import { signOutAction } from "@/actions/auth";
 import { cn } from "@/lib/utils";
 import { ArrowLeftIcon, Loader2, LogOutIcon } from "lucide-react";
+import { signOut } from "next-auth/react";
 
 import { Button } from "../ui/button";
 import ThemeToggleButton from "./ThemeToggleButton";
@@ -27,7 +27,7 @@ export default function PageHeader({
   const [loading, setLoading] = useState(false);
   const handleSignOut = async () => {
     setLoading(true);
-    await signOutAction();
+    await signOut();
     setLoading(false);
   };
   return (
