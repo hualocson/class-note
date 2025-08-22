@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { signInAction } from "@/actions/auth";
 import { Loader2, LogInIcon, MailIcon, ShellIcon } from "lucide-react";
+import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -68,24 +69,35 @@ const SignInForm = () => {
               </div>
             </div>
 
-            <Button
-              type="submit"
-              disabled={loading || !email.trim()}
-              className="h-11 w-full font-medium"
-              size="lg"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Signing in...
-                </>
-              ) : (
-                <>
-                  <LogInIcon className="h-4 w-4" />
-                  Sign in with Email
-                </>
-              )}
-            </Button>
+            <div className="space-y-3">
+              <Button
+                type="submit"
+                disabled={loading || !email.trim()}
+                className="h-11 w-full font-medium"
+                size="lg"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Signing in...
+                  </>
+                ) : (
+                  <>
+                    <LogInIcon className="mr-2 h-4 w-4" />
+                    Sign in with Email
+                  </>
+                )}
+              </Button>
+              <Button
+                type="button"
+                onClick={() => signIn("google")}
+                className="h-11 w-full font-medium"
+                size="lg"
+              >
+                <LogInIcon className="mr-2 h-4 w-4" />
+                Sign in with Google
+              </Button>
+            </div>
           </form>
         </div>
 
