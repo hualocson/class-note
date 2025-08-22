@@ -2,14 +2,14 @@
 
 import React, { PropsWithChildren } from "react";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { getQueryClient } from "@/app/getQueryClient";
+import { QueryClientProvider } from "@tanstack/react-query";
 
 import { Toaster } from "../ui/sonner";
 import { ThemeProvider } from "./theme-provider";
 
-const queryClient = new QueryClient();
-
 const Providers: React.FC<PropsWithChildren> = ({ children }) => {
+  const queryClient = getQueryClient();
   return (
     <>
       <ThemeProvider
