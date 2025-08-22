@@ -1,10 +1,13 @@
+import HydratedClasses from "../hydratedClasses";
 import MainClassSessionsPage from "./components/main";
 
 const ClassSessionsPage = () => {
   return (
-    <div className="bg-background text-foreground">
-      <MainClassSessionsPage />
-    </div>
+    <HydratedClasses>
+      <div className="bg-background text-foreground">
+        <MainClassSessionsPage />
+      </div>
+    </HydratedClasses>
   );
 };
 
