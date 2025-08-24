@@ -49,10 +49,13 @@ const ClassSessionListingSection: FC<IClassSessionListingSectionProps> = ({
   selectedDate,
 }) => {
   const classSessionsQueryData = useQuery({
-    queryKey: ["class-sessions", selectedDate.toISOString()],
+    queryKey: [
+      "class-sessions",
+      new Date(selectedDate.setHours(0, 0, 0, 0)).toISOString(),
+    ],
     queryFn: async () => {
       const result = await getClassSessions({
-        date: new Date(selectedDate).toISOString(),
+        date: new Date(selectedDate.setHours(0, 0, 0, 0)).toISOString(),
       });
 
       if (!result.success) {

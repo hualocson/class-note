@@ -53,7 +53,7 @@ const GroupGrid: FC<IGroupGridProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-3 md:gap-4">
+      <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center md:gap-4">
         <h3 className="flex shrink-0 items-center gap-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
           {icon}
           {title}
