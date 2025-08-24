@@ -12,8 +12,6 @@ import ClassSessionListingSection from "./class-session-listing/ClassSessionList
 const MainClassSessionsPage = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  console.log({ selectedDate });
-
   return (
     <>
       <PageHeader
