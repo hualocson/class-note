@@ -116,7 +116,6 @@ interface IGetClassSessions {
 export const getClassSessions = async (query?: IGetClassSessions) => {
   try {
     // Calculate first time and last time of the day in local timezone
-
     if (query?.date) {
       // Parse dd/MM/YYYY explicitly in VN timezone
       const startOfDay = dayjs(query.date);
