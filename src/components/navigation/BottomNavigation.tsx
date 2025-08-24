@@ -48,7 +48,7 @@ export default function BottomNavigation() {
   return (
     <nav className="bg-background/95 supports-[backdrop-filter]:bg-background/60 border-border/50 safe-area-top safe-area-bottom fixed right-0 bottom-0 left-0 z-50 border-t backdrop-blur">
       <div className="mx-auto max-w-4xl">
-        <div className="flex items-center justify-around px-2 py-2">
+        <div className="flex items-center justify-around px-1 py-1 sm:px-2 sm:py-2">
           {navigationItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
@@ -60,23 +60,23 @@ export default function BottomNavigation() {
                 size="icon"
                 onClick={() => handleNavigation(item.href)}
                 className={cn(
-                  "group relative flex size-20 flex-col items-center justify-center rounded-xl transition-all duration-200",
+                  "group relative flex size-14 flex-col items-center justify-center rounded-lg transition-all duration-200 sm:size-16 sm:rounded-xl md:size-20",
                   isActive
                     ? "bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary dark:hover:bg-primary/20 dark:hover:text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                 )}
                 aria-label={`Navigate to ${item.name}`}
               >
-                <div className="flex flex-col items-center gap-1.5">
+                <div className="flex flex-col items-center gap-0.5 sm:gap-1 md:gap-1.5">
                   <Icon
                     className={cn(
-                      "size-4 transition-transform duration-200",
+                      "size-3.5 transition-transform duration-200 sm:size-4 md:size-4",
                       isActive && "scale-110"
                     )}
                   />
                   <span
                     className={cn(
-                      "text-xs leading-none font-medium transition-all duration-200",
+                      "text-[10px] leading-none font-medium transition-all duration-200 sm:text-xs",
                       isActive ? "text-primary" : "text-muted-foreground"
                     )}
                   >
@@ -86,7 +86,7 @@ export default function BottomNavigation() {
 
                 {/* Active indicator */}
                 {isActive && (
-                  <div className="bg-primary absolute -top-1 left-1/2 h-1.5 w-1.5 -translate-x-1/2 transform rounded-full" />
+                  <div className="bg-primary absolute -top-0.5 left-1/2 h-1 w-1 -translate-x-1/2 transform rounded-full sm:-top-1 sm:h-1.5 sm:w-1.5" />
                 )}
               </Button>
             );
