@@ -39,14 +39,14 @@ export function DateTimePicker({ value, onChange }: DateTimePickerProps) {
   }, [date, time]);
 
   return (
-    <div className="flex items-center gap-2 *:flex-1">
+    <div className="flex flex-col gap-2 *:flex-1 md:flex-row md:items-center">
       {/* Date Picker */}
       <Popover>
         <PopoverTrigger asChild>
           <Button
             type="button"
             variant="outline"
-            className="w-32 justify-between font-normal"
+            className="w-full justify-between font-normal md:w-32"
           >
             {date ? format(date, "dd/MM/yyyy") : "Select date"}
             <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
