@@ -3,8 +3,9 @@
 import { getListScheduleForAllClasses } from "@/actions/class-schedules";
 import { GetAllClassSchedulesSuccessResponseData } from "@/actions/types";
 import dayjs from "@/configs/dayjs";
+import useClassScheduleActions from "@/hooks/useClassScheduleActions";
 import { useQuery } from "@tanstack/react-query";
-import { PlusIcon } from "lucide-react";
+import { Loader2, PlusIcon } from "lucide-react";
 import { RRule } from "rrule";
 
 import { Button } from "@/components/ui/button";
@@ -21,14 +22,16 @@ const ScheduleCard: React.FC<{
   schedule: GetAllClassSchedulesSuccessResponseData["rows"][number];
   onEdit: () => void;
   onDelete: () => void;
-  onCreateBulkClassSession: () => void;
-}> = ({ schedule, onEdit, onDelete, onCreateBulkClassSession }) => {
+}> = ({ schedule, onEdit, onDelete }) => {
   const classData = schedule.class;
   if (!classData) {
     return null;
   }
 
   const rruleParsed = RRule.fromString(schedule.rrule);
+
+  const { createBulkClassSessionBaseOnScheduleMutation } =
+    useClassScheduleActions();
   return (
     <Card className="group transition-all duration-200 hover:shadow-lg">
       <CardHeader className="pb-3">
@@ -50,9 +53,21 @@ const ScheduleCard: React.FC<{
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={onCreateBulkClassSession}
+                    className="size-8"
+                    onClick={() =>
+                      createBulkClassSessionBaseOnScheduleMutation.mutate(
+                        schedule.id
+                      )
+                    }
+                    disabled={
+                      createBulkClassSessionBaseOnScheduleMutation.isPending
+                    }
                   >
-                    <PlusIcon className="h-4 w-4" />
+                    {createBulkClassSessionBaseOnScheduleMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <PlusIcon className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
               </div>
@@ -103,13 +118,11 @@ interface ISchedulesListingProps {
   onDelete: (
     schedule: GetAllClassSchedulesSuccessResponseData["rows"][number]
   ) => void;
-  onCreateBulkClassSession: (scheduleId: string) => void;
 }
 
 const SchedulesListing: React.FC<ISchedulesListingProps> = ({
   onEdit,
   onDelete,
-  onCreateBulkClassSession,
 }) => {
   const { data, isPending, isError } = useQuery({
     queryKey: ["class-schedules"],
@@ -171,14 +184,13 @@ const SchedulesListing: React.FC<ISchedulesListingProps> = ({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 px-4 md:grid-cols-2 lg:grid-cols-3">
       {data.rows.map((schedule) => (
         <ScheduleCard
           key={schedule.id}
           schedule={schedule}
           onEdit={() => onEdit(schedule)}
           onDelete={() => onDelete(schedule)}
-          onCreateBulkClassSession={() => onCreateBulkClassSession(schedule.id)}
         />
       ))}
     </div>
