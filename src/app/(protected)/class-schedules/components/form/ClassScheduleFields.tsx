@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { Weekday } from "@/enums";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { CalendarIcon, Plus, Trash2 } from "lucide-react";
+import { CalendarIcon, CopyIcon, Plus, Trash2 } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 import { RRule } from "rrule";
 
@@ -99,6 +99,30 @@ const ClassScheduleFields = ({ form }: IClassScheduleFieldsProps) => {
       Object.keys(remainingWeeklyTimes).length > 0
         ? remainingWeeklyTimes
         : null;
+
+    form.setValue(
+      "weeklyTimes",
+      newWeeklyTimes as
+        | Record<Weekday, { start: string; end: string }>
+        | undefined
+    );
+  };
+
+  const duplicateWeekdayTime = (weekday: Weekday) => {
+    const currentWeeklyTimes = form.getValues("weeklyTimes");
+    if (!currentWeeklyTimes || availableWeekdays.length === 0) {
+      return;
+    }
+
+    const newWeekday = availableWeekdays[0].value;
+
+    const newWeeklyTimes = {
+      ...currentWeeklyTimes,
+      [newWeekday]: {
+        start: currentWeeklyTimes[weekday].start,
+        end: currentWeeklyTimes[weekday].end,
+      },
+    };
 
     form.setValue(
       "weeklyTimes",
@@ -249,7 +273,7 @@ const ClassScheduleFields = ({ form }: IClassScheduleFieldsProps) => {
             <Select onValueChange={addWeekdayTime}>
               <SelectTrigger className="w-auto">
                 <SelectValue placeholder="Add weekday">
-                  <Plus className="mr-2 h-4 w-4" />
+                  <Plus className="h-4 w-4" />
                   Add Weekday
                 </SelectValue>
               </SelectTrigger>
@@ -276,15 +300,27 @@ const ClassScheduleFields = ({ form }: IClassScheduleFieldsProps) => {
               <h4 className="text-sm font-medium">
                 {weekdayOptions.find((opt) => opt.value === weekday)?.label}
               </h4>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => removeWeekdayTime(weekday)}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Remove
-              </Button>
+              {/* duplicate button */}
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => duplicateWeekdayTime(weekday)}
+                >
+                  <CopyIcon />
+                  Duplicate
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => removeWeekdayTime(weekday)}
+                >
+                  <Trash2 />
+                  Remove
+                </Button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
