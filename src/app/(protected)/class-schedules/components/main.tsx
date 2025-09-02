@@ -23,10 +23,7 @@ const MainClassSchedulesPage = () => {
 
   const [openDialog, setOpenDialog] = useState(false);
   const [openConfirmDeleteDialog, setOpenConfirmDeleteDialog] = useState(false);
-  const {
-    deleteClassScheduleMutation,
-    createBulkClassSessionBaseOnScheduleMutation,
-  } = useClassScheduleActions();
+  const { deleteClassScheduleMutation } = useClassScheduleActions();
 
   const handleDeleteSchedule = async () => {
     if (!selectedSchedule) {
@@ -39,10 +36,6 @@ const MainClassSchedulesPage = () => {
     });
   };
 
-  const handleCreateBulkClassSession = (scheduleId: string) => {
-    createBulkClassSessionBaseOnScheduleMutation.mutate(scheduleId);
-  };
-
   return (
     <>
       <PageHeader
@@ -50,7 +43,7 @@ const MainClassSchedulesPage = () => {
         icon={<CalendarDays className="text-primary size-4" />}
       />
       <main className="mx-auto max-w-4xl space-y-4 py-4">
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-2 px-4">
           <Input placeholder="Search" />
           <Button
             onClick={() => {
@@ -81,7 +74,6 @@ const MainClassSchedulesPage = () => {
           />
         </div>
         <SchedulesListing
-          onCreateBulkClassSession={handleCreateBulkClassSession}
           onEdit={(schedule) => {
             setSelectedSchedule({
               id: schedule.id,
