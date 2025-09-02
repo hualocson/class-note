@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import dayjs from "@/configs/dayjs";
 import { PaymentStatus } from "@/enums";
 import { cn } from "@/lib/utils";
 import { type SelectClassType } from "@/schemas/classes";
@@ -85,7 +86,22 @@ const PaymentFormFields: React.FC<IPaymentFormFieldsProps> = ({ form }) => {
                   <Calendar
                     mode="single"
                     selected={field.value ? new Date(field.value) : undefined}
-                    onSelect={(date) => field.onChange(date?.toISOString())}
+                    onSelect={(date) => {
+                      if (date && dayjs(date).isValid()) {
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(
+                          2,
+                          "0"
+                        );
+                        const day = String(date.getDate()).padStart(2, "0");
+
+                        // Create ISO-like string but preserve local timezone
+                        const localDateString = `${year}-${month}-${day}T00:00:00`;
+                        field.onChange(localDateString);
+                      } else {
+                        field.onChange(undefined);
+                      }
+                    }}
                     disabled={(date) => date < new Date("1900-01-01")}
                     captionLayout="dropdown"
                   />

@@ -26,6 +26,14 @@ const useClassSessionActions = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["class-sessions"] });
+      queryClient.invalidateQueries({
+        queryKey: ["payments-table"],
+        refetchType: "all",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["payment-stats"],
+        refetchType: "all",
+      });
     },
     onError: (error) => {
       toast.error(error.message);
@@ -53,6 +61,14 @@ const useClassSessionActions = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["class-sessions"] });
+      queryClient.invalidateQueries({
+        queryKey: ["payments-table"],
+        refetchType: "all",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["payment-stats"],
+        refetchType: "all",
+      });
     },
     onError: (error) => {
       toast.error(error.message);
@@ -89,6 +105,14 @@ const useClassSessionActions = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["class-sessions"] });
+      queryClient.invalidateQueries({
+        queryKey: ["payments-table"],
+        refetchType: "all",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["payment-stats"],
+        refetchType: "all",
+      });
     },
     onError: (error) => {
       toast.error(error.message);

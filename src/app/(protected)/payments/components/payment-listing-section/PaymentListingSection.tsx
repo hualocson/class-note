@@ -1,45 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
-import { getPayments } from "@/actions/payments";
+import { PaymentStatus } from "@/enums";
+import useClassesQuery from "@/hooks/useClassesQuery";
 import usePaymentActions from "@/hooks/usePaymentActions";
-import { useQuery } from "@tanstack/react-query";
+import { ColumnFiltersState } from "@tanstack/react-table";
 
 import PaymentDialog from "../PaymentDialog";
+import PaymentStatsSection from "../PaymentStatsSeciton";
 import { PaymentDataType } from "../form/schema";
-import EmptyPaymentsState from "./EmptyPaymentsState";
-import PaymentsGrid from "./PaymentsGrid";
-import PaymentsHeader from "./PaymentsHeader";
-import PaymentsLoadingState from "./PaymentsLoadingState";
+import PaymentTable from "../payment-table-view/PaymentTable";
 
 const PaymentListingSection: React.FC = () => {
-  const paymentsQueryData = useQuery({
-    queryKey: ["payments"],
-    queryFn: async () => {
-      const result = await getPayments();
-
-      if (!result.success) {
-        throw new Error(result.error || "Failed to load payments");
-      }
-
-      return result.data;
-    },
-  });
-
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const [columnFilters, setColumnFilters] = useState<
+    ColumnFiltersState | undefined
+  >();
+
   const [selectedPayment, setSelectedPayment] = useState<{
     id?: string;
     data: PaymentDataType;
   } | null>(null);
 
   const { deletePaymentMutation } = usePaymentActions();
+  const classesQueryData = useClassesQuery();
 
   const handleDeletePayment = async (id: string) => {
     deletePaymentMutation.mutate(id, {
       onSuccess: () => {
         setIsDialogOpen(false);
-        paymentsQueryData.refetch();
       },
     });
   };
@@ -48,34 +39,57 @@ const PaymentListingSection: React.FC = () => {
     setSelectedPayment(null);
     setIsDialogOpen(true);
   };
+  const filters = useMemo(() => {
+    if (!columnFilters) {
+      return undefined;
+    }
+    const status = columnFilters.find((c) => c.id === "status")?.value as
+      | [PaymentStatus, ...PaymentStatus[]]
+      | undefined;
 
-  const handleEditPayment = (payment: {
-    id?: string;
-    data: PaymentDataType;
-  }) => {
-    setSelectedPayment(payment);
-    setIsDialogOpen(true);
-  };
+    const dateRange = columnFilters.find((c) => c.id === "date")?.value as
+      | number[]
+      | undefined;
+    const dateRangeString = dateRange
+      ? `${dateRange[0]}-${dateRange[1]}`
+      : undefined;
 
-  return (
+    const classIds = columnFilters.find((c) => c.id === "class")?.value as
+      | string[]
+      | undefined;
+
+    return {
+      dateRange: dateRangeString,
+      status,
+      classIds,
+    };
+  }, [columnFilters]);
+
+  return classesQueryData.isPending ? (
+    <>Loading...</>
+  ) : classesQueryData.isSuccess ? (
     <>
+      <PaymentStatsSection filters={filters} />
       <section>
-        <PaymentsHeader
-          paymentCount={paymentsQueryData.data?.rowCount ?? 0}
+        <PaymentTable
           onAddPayment={handleAddPayment}
+          onDeletePayment={handleDeletePayment}
+          onEditPayment={(data) => {
+            setSelectedPayment({
+              id: data.id,
+              data: {
+                date: data.date.toISOString(),
+                classId: data.classId,
+                amount: data.amount,
+                status: data.status,
+                notes: data.notes ?? undefined,
+              },
+            });
+            setIsDialogOpen(true);
+          }}
+          onFilterChange={setColumnFilters}
+          classes={classesQueryData.data.rows}
         />
-
-        {paymentsQueryData.isPending ? (
-          <PaymentsLoadingState />
-        ) : paymentsQueryData.data?.rowCount === 0 ? (
-          <EmptyPaymentsState onAddPayment={handleAddPayment} />
-        ) : (
-          <PaymentsGrid
-            payments={paymentsQueryData.data?.rows ?? []}
-            onEdit={handleEditPayment}
-            onDelete={handleDeletePayment}
-          />
-        )}
       </section>
 
       <PaymentDialog
@@ -84,6 +98,8 @@ const PaymentListingSection: React.FC = () => {
         defaultValues={selectedPayment !== null ? selectedPayment : undefined}
       />
     </>
+  ) : (
+    <>Error loading classes</>
   );
 };
 
