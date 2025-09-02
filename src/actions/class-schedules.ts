@@ -108,22 +108,35 @@ export async function createBulkClassSessionBaseOnSchedule(id: string) {
     .where(eq(classSchedulesTable.id, id))
     .limit(1);
 
-  if (!schedule) {
+  if (!schedule || !schedule.class) {
     return makeActionError("Schedule not found");
   }
 
-  const { rrule, weeklyTimes } = schedule;
+  const { rrule, weeklyTimes, classId } = schedule;
 
   // start date is monday of current week and end date is sunday of current week
   const startDate = dayjs().startOf("week").startOf("day").toDate();
   const endDate = dayjs().endOf("week").endOf("day").toDate();
 
   const rruleParsed = RRule.fromString(rrule);
-  const dates = rruleParsed.between(startDate, endDate, true);
+  const dates = rruleParsed
+    .between(startDate, endDate, true)
+    .map((date) => dayjs(date).format("YYYY-MM-DD"));
 
   // set time for each date , type of weeklyTimes is Record<Weekday, { start: string; end: string; }> start format is HH:mm and end format is HH:mm
+
   const datesWithTime = dates.map((date) => {
     const weekday = dayjs(date).format("dd").toUpperCase() as Weekday;
+
+    console.log({
+      date: dayjs(date)
+        .set("hour", 0)
+        .set("minute", 0)
+        .set("second", 0)
+        .set("millisecond", 0)
+        .format("YYYY-MM-DD HH:mm:ss"),
+    });
+
     const time = weeklyTimes[weekday];
     return dayjs(date)
       .set("hour", parseInt(time.start.split(":")[0]))
@@ -142,7 +155,8 @@ export async function createBulkClassSessionBaseOnSchedule(id: string) {
     .where(
       and(
         inArray(classSessionsTable.date, datesWithTime),
-        eq(classSessionsTable.isDeleted, false)
+        eq(classSessionsTable.isDeleted, false),
+        eq(classSessionsTable.classId, classId)
       )
     );
 
