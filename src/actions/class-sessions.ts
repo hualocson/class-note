@@ -222,7 +222,7 @@ export const finishClassSession = async (id: string) => {
       db
         .insert(paymentsTable)
         .values({
-          date: new Date(),
+          date: currentSession.date, // date of this class session
           classId: currentSession.classId,
           sessionId: id,
           amount: currentSession.fee,
