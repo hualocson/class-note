@@ -252,7 +252,6 @@ export async function getPaymentStats(filters?: IGetPaymentsParams["filters"]) {
   try {
     // Calculate first day and last day of the month
     const { dateRange, status, classIds } = filters ?? {};
-    console.log({ filters });
     const dateRangeArray = dateRange?.split("-");
     const fromDate = dateRangeArray?.[0]
       ? dayjs.unix(Number(dateRangeArray[0]) / 1000).toDate()
