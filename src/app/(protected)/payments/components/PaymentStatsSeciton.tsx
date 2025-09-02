@@ -3,6 +3,7 @@
 import { PropsWithChildren } from "react";
 
 import { getPaymentStats } from "@/actions/payments";
+import { PaymentStatus } from "@/enums";
 import formatPrice from "@/lib/format-price";
 import { useQuery } from "@tanstack/react-query";
 import { Clock, DollarSign, TrendingUp, XCircle } from "lucide-react";
@@ -20,11 +21,21 @@ const MobileItem: React.FC<PropsWithChildren> = ({ children }) => {
   );
 };
 
-const PaymentStatsSection: React.FC = () => {
+interface IPaymentStatsSectionProps {
+  filters?: {
+    dateRange?: string;
+    status?: [PaymentStatus, ...PaymentStatus[]];
+    classIds?: string[];
+  };
+}
+
+const PaymentStatsSection: React.FC<IPaymentStatsSectionProps> = ({
+  filters,
+}) => {
   const { data, isPending } = useQuery({
-    queryKey: ["payment-stats", new Date().getMonth()],
+    queryKey: ["payment-stats", filters],
     queryFn: async () => {
-      const result = await getPaymentStats();
+      const result = await getPaymentStats(filters);
 
       if (!result.success) {
         throw new Error(result.error || "Failed to load payment stats");
