@@ -4,9 +4,19 @@ import { revalidatePath } from "next/cache";
 
 import { db } from "@/db";
 import { PaymentStatus } from "@/enums";
-import { SelectClassType, classesTable } from "@/schemas/classes";
+import { classesTable } from "@/schemas/classes";
 import { SelectPayment, paymentsTable } from "@/schemas/payments";
-import { and, desc, eq, getTableColumns, gte, lte, sql } from "drizzle-orm";
+import dayjs from "dayjs";
+import {
+  and,
+  desc,
+  eq,
+  getTableColumns,
+  gte,
+  inArray,
+  lte,
+  sql,
+} from "drizzle-orm";
 
 import {
   makeActionError,
@@ -128,17 +138,31 @@ export async function deletePayment(
   }
 }
 
-export async function getPayments(options?: {
-  status?: PaymentStatus;
-  classId?: string;
-  startDate?: string;
-  endDate?: string;
-}): Promise<
-  ActionListResponse<
-    SelectPayment & { class: Pick<SelectClassType, "name" | "code" | "color"> }
-  >
-> {
+interface IGetPaymentsParams {
+  pagination?: {
+    pageSize?: number;
+    pageIndex?: number;
+  };
+  filters?: {
+    status?: [PaymentStatus, ...PaymentStatus[]];
+    dateRange?: string;
+    classIds?: string[];
+  };
+}
+
+export async function getPayments(params?: IGetPaymentsParams) {
   try {
+    const { pagination, filters } = params ?? {};
+
+    const dateRange = filters?.dateRange;
+    const dateRangeArray = dateRange?.split("-");
+    const fromDate = dateRangeArray?.[0]
+      ? dayjs.unix(Number(dateRangeArray[0]) / 1000).toDate()
+      : undefined;
+    const toDate = dateRangeArray?.[1]
+      ? dayjs.unix(Number(dateRangeArray[1]) / 1000).toDate()
+      : undefined;
+
     const payments = await db
       .select({
         rowCount: sql<number>`count(*) over()`.mapWith(Number),
@@ -154,20 +178,22 @@ export async function getPayments(options?: {
       .where(
         and(
           eq(classesTable.isDeleted, false),
-          ...(options?.status
-            ? [eq(paymentsTable.status, options.status)]
+          ...(filters?.status
+            ? [inArray(paymentsTable.status, filters.status)]
             : []),
-          ...(options?.classId
-            ? [eq(paymentsTable.classId, options.classId)]
+          ...(fromDate && toDate
+            ? [
+                gte(paymentsTable.date, fromDate),
+                lte(paymentsTable.date, toDate),
+              ]
             : []),
-          ...(options?.startDate
-            ? [gte(paymentsTable.date, new Date(options.startDate))]
-            : []),
-          ...(options?.endDate
-            ? [lte(paymentsTable.date, new Date(options.endDate))]
+          ...(filters?.classIds
+            ? [inArray(paymentsTable.classId, filters.classIds)]
             : [])
         )
       )
+      .limit(pagination?.pageSize ?? 10)
+      .offset((pagination?.pageIndex ?? 0) * (pagination?.pageSize ?? 10))
       .orderBy(desc(paymentsTable.date));
 
     return makeActionListSuccess({
@@ -222,25 +248,18 @@ export async function getPaymentById(
   }
 }
 
-export async function getPaymentStats(month?: string) {
+export async function getPaymentStats(filters?: IGetPaymentsParams["filters"]) {
   try {
     // Calculate first day and last day of the month
-    const monthDate = month ? new Date(month) : new Date();
-    const firstDayOfMonth = new Date(
-      monthDate.getFullYear(),
-      monthDate.getMonth(),
-      1
-    );
-    const lastDayOfMonth = new Date(
-      monthDate.getFullYear(),
-      monthDate.getMonth() + 1,
-      0,
-      23,
-      59,
-      59,
-      999
-    );
-
+    const { dateRange, status, classIds } = filters ?? {};
+    console.log({ filters });
+    const dateRangeArray = dateRange?.split("-");
+    const fromDate = dateRangeArray?.[0]
+      ? dayjs.unix(Number(dateRangeArray[0]) / 1000).toDate()
+      : undefined;
+    const toDate = dateRangeArray?.[1]
+      ? dayjs.unix(Number(dateRangeArray[1]) / 1000).toDate()
+      : undefined;
     const [stats] = await db
       .select({
         totalAmount: sql<number>`COALESCE(SUM(amount), 0)`.mapWith(Number),
@@ -261,9 +280,15 @@ export async function getPaymentStats(month?: string) {
       .innerJoin(classesTable, eq(paymentsTable.classId, classesTable.id))
       .where(
         and(
-          gte(paymentsTable.date, firstDayOfMonth),
-          lte(paymentsTable.date, lastDayOfMonth),
-          eq(classesTable.isDeleted, false)
+          ...(fromDate && toDate
+            ? [
+                gte(paymentsTable.date, fromDate),
+                lte(paymentsTable.date, toDate),
+              ]
+            : []),
+          eq(classesTable.isDeleted, false),
+          ...(status ? [inArray(paymentsTable.status, status)] : []),
+          ...(classIds ? [inArray(paymentsTable.classId, classIds)] : [])
         )
       );
 
@@ -344,5 +369,53 @@ export async function getPaymentsClassStats(
     }
 
     return makeActionError("Failed to fetch payment class stats");
+  }
+}
+
+export async function deletePayments(paymentIds: string[]) {
+  try {
+    const result = await db
+      .delete(paymentsTable)
+      .where(inArray(paymentsTable.id, paymentIds))
+      .returning({
+        id: paymentsTable.id,
+      });
+
+    return makeActionSuccess({
+      deletedCount: result.length,
+    });
+  } catch (error) {
+    console.error("Error deleting payments:", error);
+
+    if (error instanceof Error) {
+      return makeActionError(error.message);
+    }
+
+    return makeActionError("Failed to delete payments");
+  }
+}
+
+export async function batchUpdatePaymentsStatus(
+  paymentIds: string[],
+  status: PaymentStatus
+) {
+  try {
+    const result = await db
+      .update(paymentsTable)
+      .set({ status })
+      .where(inArray(paymentsTable.id, paymentIds))
+      .returning();
+
+    return makeActionSuccess({
+      updatedCount: result.length,
+    });
+  } catch (error) {
+    console.error("Error updating payments status:", error);
+
+    if (error instanceof Error) {
+      return makeActionError(error.message);
+    }
+
+    return makeActionError("Failed to update payments status");
   }
 }
