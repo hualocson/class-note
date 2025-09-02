@@ -45,7 +45,7 @@ const PaymentStatsSection: React.FC<IPaymentStatsSectionProps> = ({
     },
   });
 
-  if (isPending) {
+  if (isPending || typeof window === "undefined") {
     return (
       <div className="mb-6">
         <div className="hidden gap-2 md:grid-cols-2 lg:grid-cols-4">
