@@ -128,15 +128,6 @@ export async function createBulkClassSessionBaseOnSchedule(id: string) {
   const datesWithTime = dates.map((date) => {
     const weekday = dayjs(date).format("dd").toUpperCase() as Weekday;
 
-    console.log({
-      date: dayjs(date)
-        .set("hour", 0)
-        .set("minute", 0)
-        .set("second", 0)
-        .set("millisecond", 0)
-        .format("YYYY-MM-DD HH:mm:ss"),
-    });
-
     const time = weeklyTimes[weekday];
     return dayjs(date)
       .set("hour", parseInt(time.start.split(":")[0]))
