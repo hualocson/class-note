@@ -27,6 +27,7 @@ const genClassFilter: (
       value: classItem.id,
       label: classItem.name,
     })),
+    multiple: true,
   },
   multiple: true,
 });
