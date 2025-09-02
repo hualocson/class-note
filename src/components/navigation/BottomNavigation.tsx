@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 
 import { cn } from "@/lib/utils";
-import { BookOpen, Calendar, CreditCard, Home } from "lucide-react";
+import { BookOpen, CreditCard, Home } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -18,11 +18,6 @@ const navigationItems: NavigationItem[] = [
     name: "Home",
     href: "/",
     icon: Home,
-  },
-  {
-    name: "Sessions",
-    href: "/class-sessions",
-    icon: Calendar,
   },
   {
     name: "Classes",
