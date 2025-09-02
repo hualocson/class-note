@@ -56,8 +56,6 @@ export function DataTableToolbar<TData>({
         )}
         {dateRangeFilter && (
           <DateRangeSelector
-            size="sm"
-            variant="outline"
             onValueChange={(values) => {
               const { from, to } = values;
               table
