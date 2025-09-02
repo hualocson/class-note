@@ -1,7 +1,12 @@
+import HydratedClasses from "../hydratedClasses";
 import MainPaymentsPage from "./components/main";
 
 const PaymentsPage = () => {
-  return <MainPaymentsPage />;
+  return (
+    <HydratedClasses>
+      <MainPaymentsPage />
+    </HydratedClasses>
+  );
 };
 
 export default PaymentsPage;
