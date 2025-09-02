@@ -27,7 +27,7 @@ const usePaymentActions = () => {
     },
     onSuccess: () => {
       toast.success("Payment created successfully");
-      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: ["payments-table"] });
       queryClient.invalidateQueries({ queryKey: ["payment-stats"] });
     },
     onError: () => {
@@ -50,7 +50,7 @@ const usePaymentActions = () => {
     },
     onSuccess: () => {
       toast.success("Payment updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: ["payments-table"] });
       queryClient.invalidateQueries({ queryKey: ["payment-stats"] });
     },
     onError: () => {
@@ -70,7 +70,7 @@ const usePaymentActions = () => {
     },
     onSuccess: () => {
       toast.success("Payment deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: ["payments-table"] });
       queryClient.invalidateQueries({ queryKey: ["payment-stats"] });
     },
     onError: () => {
