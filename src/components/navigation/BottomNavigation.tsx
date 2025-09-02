@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 
 import { cn } from "@/lib/utils";
-import { BookOpen, CreditCard, Home } from "lucide-react";
+import { BookOpen, CreditCard } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -15,20 +15,14 @@ interface NavigationItem {
 
 const navigationItems: NavigationItem[] = [
   {
-    name: "Home",
+    name: "Payments",
     href: "/",
-    icon: Home,
+    icon: CreditCard,
   },
   {
     name: "Classes",
     href: "/classes",
     icon: BookOpen,
-  },
-
-  {
-    name: "Payments",
-    href: "/payments",
-    icon: CreditCard,
   },
 ];
 
