@@ -4,7 +4,6 @@ import { DollarSign } from "lucide-react";
 
 import PageHeader from "@/components/common/PageHeader";
 
-import PaymentStatsSection from "./PaymentStatsSeciton";
 import PaymentListingSection from "./payment-listing-section/PaymentListingSection";
 
 const MainPaymentsPage = () => {
@@ -20,7 +19,6 @@ const MainPaymentsPage = () => {
 
       {/* Main Content */}
       <main className="mx-auto max-w-4xl px-4 py-6 pb-24">
-        <PaymentStatsSection />
         {/* Payments List */}
         <PaymentListingSection />
       </main>
