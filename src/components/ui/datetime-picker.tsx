@@ -21,7 +21,6 @@ interface DateTimePickerProps {
 
 export function DateTimePicker({ value, onChange }: DateTimePickerProps) {
   const [date, setDate] = React.useState<Date | undefined>(value);
-  console.log({ value });
   const [time, setTime] = React.useState(
     value ? format(value, "HH:mm") : "00:00"
   );
