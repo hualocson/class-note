@@ -6,6 +6,7 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { Checkbox } from "@/components/ui/checkbox";
 
+import type { DataTableFeatures } from "@/components/common/date-table/features";
 import { makeColumns } from "@/components/common/date-table/hooks/useDataTable";
 import RowActions from "@/components/common/date-table/row-actions";
 
@@ -30,14 +31,14 @@ const StatusBadge = ({ status }: { status: PaymentType["status"] }) => {
   );
 };
 
-const actionCol: ColumnDef<PaymentType> = {
+const actionCol: ColumnDef<DataTableFeatures, PaymentType> = {
   id: "action-col",
   enableHiding: false,
   enableSorting: false,
   cell: ({ row, table }) => <RowActions row={row} meta={table.options.meta} />,
 };
 
-const checkboxCol: ColumnDef<PaymentType> = {
+const checkboxCol: ColumnDef<DataTableFeatures, PaymentType> = {
   id: "select",
   header: ({ table }) => (
     <div className="min-w-12 px-0 pr-4 text-center">

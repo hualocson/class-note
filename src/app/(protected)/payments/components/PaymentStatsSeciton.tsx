@@ -2,12 +2,11 @@
 
 import { PropsWithChildren } from "react";
 
-import { getPaymentStats } from "@/actions/payments";
-import { PaymentStatus } from "@/enums";
+import type { GetPaymentStatsSuccessResponseData } from "@/actions/types";
 import formatPrice from "@/lib/format-price";
-import { useQuery } from "@tanstack/react-query";
 import { Clock, DollarSign, TrendingUp, XCircle } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Carousel,
@@ -22,33 +21,33 @@ const MobileItem: React.FC<PropsWithChildren> = ({ children }) => {
 };
 
 interface IPaymentStatsSectionProps {
-  filters?: {
-    dateRange?: string;
-    status?: [PaymentStatus, ...PaymentStatus[]];
-    classIds?: string[];
-  };
+  data?: GetPaymentStatsSuccessResponseData;
+  isLoading: boolean;
+  error: Error | null;
+  onRetry: () => void;
 }
 
 const PaymentStatsSection: React.FC<IPaymentStatsSectionProps> = ({
-  filters,
+  data,
+  isLoading,
+  error,
+  onRetry,
 }) => {
-  const { data, isPending } = useQuery({
-    queryKey: ["payment-stats", filters],
-    queryFn: async () => {
-      const result = await getPaymentStats(filters);
+  if (error) {
+    return (
+      <div role="alert" className="mb-6 space-y-2">
+        <p>Unable to load payment statistics.</p>
+        <Button variant="outline" size="sm" onClick={onRetry}>
+          Retry statistics
+        </Button>
+      </div>
+    );
+  }
 
-      if (!result.success) {
-        throw new Error(result.error || "Failed to load payment stats");
-      }
-
-      return result.data;
-    },
-  });
-
-  if (isPending || typeof window === "undefined") {
+  if (isLoading || !data) {
     return (
       <div className="mb-6">
-        <div className="hidden gap-2 md:grid-cols-2 lg:grid-cols-4">
+        <div className="hidden gap-2 md:grid md:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, index) => (
             <Card key={index}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -61,7 +60,7 @@ const PaymentStatsSection: React.FC<IPaymentStatsSectionProps> = ({
             </Card>
           ))}
         </div>
-        <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-2 md:hidden md:grid-cols-2 lg:grid-cols-4">
           {[...Array(1)].map((_, index) => (
             <Card key={index}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

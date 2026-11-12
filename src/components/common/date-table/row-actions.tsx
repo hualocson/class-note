@@ -3,7 +3,12 @@
 import React, { useCallback, useEffect } from "react";
 
 import { Dialog } from "@radix-ui/react-dialog";
-import { MenuItemConfirmation, Row, TableMeta } from "@tanstack/react-table";
+import {
+  MenuItemConfirmation,
+  Row,
+  RowData,
+  TableMeta,
+} from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 
 import {
@@ -26,9 +31,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-interface ActionProps<TData> {
-  row: Row<TData>;
-  meta?: TableMeta<TData>;
+import type { DataTableFeatures } from "./features";
+
+interface ActionProps<TData extends RowData> {
+  row: Row<DataTableFeatures, TData>;
+  meta?: TableMeta<DataTableFeatures, TData>;
 }
 
 interface MenuItemConfirmDialogProps {
@@ -106,7 +113,10 @@ export function MenuItemDialog({
   );
 }
 
-export default function RowActions<TData>({ row, meta }: ActionProps<TData>) {
+export default function RowActions<TData extends RowData>({
+  row,
+  meta,
+}: ActionProps<TData>) {
   const [open, setOpen] = React.useState(false);
   if (
     meta?.menuItems?.length === 0 &&

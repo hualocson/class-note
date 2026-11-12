@@ -64,6 +64,7 @@ We welcome contributions! Please follow these steps:
 3. **Make your changes** following our [coding standards](.cursorrules)
 4. **Test your changes**
    ```bash
+   npm test
    npm run lint
    npm run type-check
    npm run build
@@ -77,6 +78,10 @@ We welcome contributions! Please follow these steps:
    git push origin feature/amazing-feature
    ```
 7. **Open a Pull Request**
+
+The payments regression suite runs with `npm test` on Node.js 24. It uses an
+in-memory PostgreSQL database and mocked action boundaries; it does not write to
+the configured database.
 
 ### Commit Convention
 

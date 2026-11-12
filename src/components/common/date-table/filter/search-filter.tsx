@@ -14,8 +14,10 @@ import {
 
 import DebounceInput from "@/components/common/DebounceInput";
 
-interface IProps<TData> {
-  table: Table<TData>;
+import type { DataTableFeatures } from "../features";
+
+interface IProps<TData extends RowData> {
+  table: Table<DataTableFeatures, TData>;
   searchKeys?: Array<{ key: string; label: string }>;
 }
 

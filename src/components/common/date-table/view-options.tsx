@@ -1,6 +1,6 @@
 "use client";
 
-import { Table } from "@tanstack/react-table";
+import { RowData, Table } from "@tanstack/react-table";
 import { Columns } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -13,17 +13,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-/**
- * @template TData
- * @typedef {Object} DataTableViewOptionsProps
- * @property {Table<TData>} table
- */
+import type { DataTableFeatures } from "./features";
 
-interface DataTableViewOptionsProps<TData> {
-  table: Table<TData>;
+interface DataTableViewOptionsProps<TData extends RowData> {
+  table: Table<DataTableFeatures, TData>;
 }
 
-export function DataTableViewOptions<TData>({
+export function DataTableViewOptions<TData extends RowData>({
   table,
 }: DataTableViewOptionsProps<TData>) {
   return (

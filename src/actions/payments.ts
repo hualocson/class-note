@@ -2,11 +2,20 @@
 
 import { revalidatePath } from "next/cache";
 
+import { auth } from "@/configs/auth.config";
 import { db } from "@/db";
+import {
+  buildPaymentRowsQuery,
+  buildPaymentSummaryQuery,
+} from "@/db/queries/payments";
 import { PaymentStatus } from "@/enums";
+import {
+  PaymentFilters,
+  normalizePaymentFilters,
+  parsePaymentPagination,
+} from "@/lib/payment-filters";
 import { classesTable } from "@/schemas/classes";
 import { SelectPayment, paymentsTable } from "@/schemas/payments";
-import dayjs from "dayjs";
 import {
   and,
   desc,
@@ -18,11 +27,7 @@ import {
   sql,
 } from "drizzle-orm";
 
-import {
-  makeActionError,
-  makeActionListSuccess,
-  makeActionSuccess,
-} from "./utils";
+import { makeActionError, makeActionSuccess } from "./utils";
 
 export interface CreatePaymentData {
   date: Date;
@@ -143,63 +148,18 @@ interface IGetPaymentsParams {
     pageSize?: number;
     pageIndex?: number;
   };
-  filters?: {
-    status?: [PaymentStatus, ...PaymentStatus[]];
-    dateRange?: string;
-    classIds?: string[];
-  };
+  filters?: PaymentFilters;
 }
 
 export async function getPayments(params?: IGetPaymentsParams) {
   try {
-    const { pagination, filters } = params ?? {};
-
-    const dateRange = filters?.dateRange;
-    const dateRangeArray = dateRange?.split("-");
-    const fromDate = dateRangeArray?.[0]
-      ? dayjs.unix(Number(dateRangeArray[0]) / 1000).toDate()
-      : undefined;
-    const toDate = dateRangeArray?.[1]
-      ? dayjs.unix(Number(dateRangeArray[1]) / 1000).toDate()
-      : undefined;
-
-    const payments = await db
-      .select({
-        rowCount: sql<number>`count(*) over()`.mapWith(Number),
-        ...getTableColumns(paymentsTable),
-        class: {
-          name: classesTable.name,
-          code: classesTable.code,
-          color: classesTable.color,
-        },
-      })
-      .from(paymentsTable)
-      .innerJoin(classesTable, eq(paymentsTable.classId, classesTable.id))
-      .where(
-        and(
-          eq(classesTable.isDeleted, false),
-          ...(filters?.status
-            ? [inArray(paymentsTable.status, filters.status)]
-            : []),
-          ...(fromDate && toDate
-            ? [
-                gte(paymentsTable.date, fromDate),
-                lte(paymentsTable.date, toDate),
-              ]
-            : []),
-          ...(filters?.classIds
-            ? [inArray(paymentsTable.classId, filters.classIds)]
-            : [])
-        )
-      )
-      .limit(pagination?.pageSize ?? 10)
-      .offset((pagination?.pageIndex ?? 0) * (pagination?.pageSize ?? 10))
-      .orderBy(desc(paymentsTable.date));
-
-    return makeActionListSuccess({
-      rows: payments,
-      rowCount: payments.length > 0 ? payments[0].rowCount : 0,
-    });
+    if (!(await auth())) {
+      return makeActionError("Unauthorized");
+    }
+    const pagination = parsePaymentPagination(params?.pagination);
+    const filters = normalizePaymentFilters(params?.filters);
+    const rows = await buildPaymentRowsQuery(pagination, filters);
+    return makeActionSuccess({ rows });
   } catch (error) {
     console.error("Error fetching payments:", error);
 
@@ -250,47 +210,12 @@ export async function getPaymentById(
 
 export async function getPaymentStats(filters?: IGetPaymentsParams["filters"]) {
   try {
-    // Calculate first day and last day of the month
-    const { dateRange, status, classIds } = filters ?? {};
-    const dateRangeArray = dateRange?.split("-");
-    const fromDate = dateRangeArray?.[0]
-      ? dayjs.unix(Number(dateRangeArray[0]) / 1000).toDate()
-      : undefined;
-    const toDate = dateRangeArray?.[1]
-      ? dayjs.unix(Number(dateRangeArray[1]) / 1000).toDate()
-      : undefined;
-    const [stats] = await db
-      .select({
-        totalAmount: sql<number>`COALESCE(SUM(amount), 0)`.mapWith(Number),
-        paidAmount:
-          sql<number>`COALESCE(SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END), 0)`.mapWith(
-            Number
-          ),
-        pendingAmount:
-          sql<number>`COALESCE(SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END), 0)`.mapWith(
-            Number
-          ),
-        cancelledAmount:
-          sql<number>`COALESCE(SUM(CASE WHEN status = 'cancelled' THEN amount ELSE 0 END), 0)`.mapWith(
-            Number
-          ),
-      })
-      .from(paymentsTable)
-      .innerJoin(classesTable, eq(paymentsTable.classId, classesTable.id))
-      .where(
-        and(
-          ...(fromDate && toDate
-            ? [
-                gte(paymentsTable.date, fromDate),
-                lte(paymentsTable.date, toDate),
-              ]
-            : []),
-          eq(classesTable.isDeleted, false),
-          ...(status ? [inArray(paymentsTable.status, status)] : []),
-          ...(classIds ? [inArray(paymentsTable.classId, classIds)] : [])
-        )
-      );
-
+    if (!(await auth())) {
+      return makeActionError("Unauthorized");
+    }
+    const [stats] = await buildPaymentSummaryQuery(
+      normalizePaymentFilters(filters)
+    );
     return makeActionSuccess(stats);
   } catch (error) {
     console.error("Error fetching payment stats:", error);

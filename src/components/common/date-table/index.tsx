@@ -9,13 +9,12 @@ import {
   OnChangeFn,
   PaginationData,
   PaginationState,
+  RowData,
   SortingState,
   type Table as TTable,
   TableMeta,
   flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
+  useTable,
 } from "@tanstack/react-table";
 
 import { Skeleton } from "@/components/ui/skeleton";
@@ -28,22 +27,23 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import { type DataTableFeatures, dataTableFeatures } from "./features";
 import { DataTablePagination } from "./pagination";
 import { DataTableToolbar } from "./toolbar";
 
-export type SelectionDialogProps<TData> = {
-  table: TTable<TData>;
+export type SelectionDialogProps<TData extends RowData> = {
+  table: TTable<DataTableFeatures, TData>;
 };
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+interface DataTableProps<TData extends RowData> {
+  columns: ColumnDef<DataTableFeatures, TData>[];
   data?: PaginationData<TData>;
   pagination: PaginationState;
   setPagination: OnChangeFn<PaginationState>;
   columnFilters?: ColumnFiltersState;
   setColumnFilters?: OnChangeFn<ColumnFiltersState>;
 
-  meta?: TableMeta<TData>;
+  meta?: TableMeta<DataTableFeatures, TData>;
   facetedFilters?: FacetedFilter<TData>[];
   tableActions?: React.ReactNode[];
   isLoading?: boolean;
@@ -68,7 +68,7 @@ interface DataTableProps<TData, TValue> {
   >;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends RowData>({
   columns,
   data,
   pagination,
@@ -84,17 +84,16 @@ export function DataTable<TData, TValue>({
   searchFilter,
   setSearchFilter,
   searchKeys = [],
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const table = useReactTable({
+  const table = useTable({
+    features: dataTableFeatures,
     data: data?.rows ?? [],
     columns,
-    getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    getSortedRowModel: getSortedRowModel(),
     onPaginationChange: setPagination,
     onGlobalFilterChange: setSearchFilter,
     rowCount: data?.rowCount ?? -1,
