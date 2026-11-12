@@ -36,6 +36,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import type { DataTableFeatures } from "@/components/common/date-table/features";
+
 import { PaymentType } from "./type";
 
 const STATUS_OPTIONS = {
@@ -53,8 +55,8 @@ const STATUS_OPTIONS = {
   },
 };
 
-interface IProps<TData> {
-  table: Table<TData>;
+interface IProps<TData extends PaymentType> {
+  table: Table<DataTableFeatures, TData>;
 }
 
 function BulkChangePaymentStatusDialog<TData extends PaymentType>({

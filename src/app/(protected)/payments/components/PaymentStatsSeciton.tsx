@@ -1,6 +1,6 @@
 "use client";
 
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useEffect, useState } from "react";
 
 import { getPaymentStats } from "@/actions/payments";
 import { PaymentStatus } from "@/enums";
@@ -27,12 +27,14 @@ interface IPaymentStatsSectionProps {
     status?: [PaymentStatus, ...PaymentStatus[]];
     classIds?: string[];
   };
+  isParentLoading?: boolean;
 }
 
 const PaymentStatsSection: React.FC<IPaymentStatsSectionProps> = ({
   filters,
+  isParentLoading,
 }) => {
-  const { data, isPending } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["payment-stats", filters],
     queryFn: async () => {
       const result = await getPaymentStats(filters);
@@ -44,11 +46,16 @@ const PaymentStatsSection: React.FC<IPaymentStatsSectionProps> = ({
       return result.data;
     },
   });
+  const [loading, setLoading] = useState(true);
 
-  if (isPending || typeof window === "undefined") {
+  useEffect(() => {
+    setLoading(isLoading || isParentLoading || false);
+  }, [isLoading, isParentLoading]);
+
+  if (loading) {
     return (
       <div className="mb-6">
-        <div className="hidden gap-2 md:grid-cols-2 lg:grid-cols-4">
+        <div className="hidden gap-2 md:grid md:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, index) => (
             <Card key={index}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -61,7 +68,7 @@ const PaymentStatsSection: React.FC<IPaymentStatsSectionProps> = ({
             </Card>
           ))}
         </div>
-        <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-2 md:hidden md:grid-cols-2 lg:grid-cols-4">
           {[...Array(1)].map((_, index) => (
             <Card key={index}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

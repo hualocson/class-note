@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { PaymentStatus } from "@/enums";
 import useClassesQuery from "@/hooks/useClassesQuery";
@@ -14,6 +14,7 @@ import PaymentTable from "../payment-table-view/PaymentTable";
 
 const PaymentListingSection: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [columnFilters, setColumnFilters] = useState<
     ColumnFiltersState | undefined
@@ -44,19 +45,16 @@ const PaymentListingSection: React.FC = () => {
       return undefined;
     }
     const status = columnFilters.find((c) => c.id === "status")?.value as
-      | [PaymentStatus, ...PaymentStatus[]]
-      | undefined;
+      [PaymentStatus, ...PaymentStatus[]] | undefined;
 
     const dateRange = columnFilters.find((c) => c.id === "date")?.value as
-      | number[]
-      | undefined;
+      number[] | undefined;
     const dateRangeString = dateRange
       ? `${dateRange[0]}-${dateRange[1]}`
       : undefined;
 
     const classIds = columnFilters.find((c) => c.id === "class")?.value as
-      | string[]
-      | undefined;
+      string[] | undefined;
 
     return {
       dateRange: dateRangeString,
@@ -65,12 +63,16 @@ const PaymentListingSection: React.FC = () => {
     };
   }, [columnFilters]);
 
-  return classesQueryData.isPending ? (
+  useEffect(() => {
+    setIsLoading(classesQueryData.isLoading);
+  }, [classesQueryData.isLoading]);
+
+  return isLoading ? (
     <>Loading...</>
-  ) : classesQueryData.isSuccess ? (
+  ) : !classesQueryData.isError ? (
     <>
-      <PaymentStatsSection filters={filters} />
-      <section>
+      <PaymentStatsSection filters={filters} isParentLoading={isLoading} />
+      {classesQueryData.data && (
         <PaymentTable
           onAddPayment={handleAddPayment}
           onDeletePayment={handleDeletePayment}
@@ -90,7 +92,7 @@ const PaymentListingSection: React.FC = () => {
           onFilterChange={setColumnFilters}
           classes={classesQueryData.data.rows}
         />
-      </section>
+      )}
 
       <PaymentDialog
         openState={isDialogOpen}

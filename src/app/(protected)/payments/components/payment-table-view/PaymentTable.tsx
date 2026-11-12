@@ -140,32 +140,30 @@ const PaymentTable: React.FC<IPaymentTableProps> = ({
   });
 
   return (
-    <>
-      <DataTable
-        columns={columns}
-        data={dataQuery.data ?? { rows: [] }}
-        pagination={pagination}
-        setPagination={setPagination}
-        columnFilters={columnFilters}
-        searchFilter={searchFilter}
-        setSearchFilter={setSearchFilter}
-        setColumnFilters={setColumnFilters}
-        isLoading={dataQuery.isPending}
-        meta={meta}
-        tableActions={[
-          <Button key="add-payment" size={"sm"} onClick={onAddPayment}>
-            <PlusIcon />
-            Add Payment
-          </Button>,
-        ]}
-        rowSelectionDialogs={{
-          bulkDelete: BulkDeletePaymentDialog,
-          bulkChangeStatus: BulkChangePaymentStatusDialog,
-        }}
-        facetedFilters={facetedFilters}
-        dateRangeFilter={dateRangeFilter}
-      />
-    </>
+    <DataTable
+      columns={columns}
+      data={dataQuery.data ?? { rows: [] }}
+      pagination={pagination}
+      setPagination={setPagination}
+      columnFilters={columnFilters}
+      searchFilter={searchFilter}
+      setSearchFilter={setSearchFilter}
+      setColumnFilters={setColumnFilters}
+      isLoading={dataQuery.isPending}
+      meta={meta}
+      tableActions={[
+        <Button key="add-payment" size={"sm"} onClick={onAddPayment}>
+          <PlusIcon />
+          Add Payment
+        </Button>,
+      ]}
+      rowSelectionDialogs={{
+        bulkDelete: BulkDeletePaymentDialog,
+        bulkChangeStatus: BulkChangePaymentStatusDialog,
+      }}
+      facetedFilters={facetedFilters}
+      dateRangeFilter={dateRangeFilter}
+    />
   );
 };
 

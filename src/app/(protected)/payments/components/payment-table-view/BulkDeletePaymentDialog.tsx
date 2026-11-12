@@ -21,10 +21,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+import type { DataTableFeatures } from "@/components/common/date-table/features";
+
 import { PaymentType } from "./type";
 
-interface IProps<TData> {
-  table: Table<TData>;
+interface IProps<TData extends PaymentType> {
+  table: Table<DataTableFeatures, TData>;
 }
 
 function BulkDeletePaymentDialog<TData extends PaymentType>({

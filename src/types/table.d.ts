@@ -1,6 +1,11 @@
-import { ReactNode } from "react";
+import { JSX, ReactNode } from "react";
 
-import { ColumnFilter, PaginationState, RowData } from "@tanstack/table-core";
+import {
+  ColumnFilter,
+  PaginationState,
+  RowData,
+  TableFeatures,
+} from "@tanstack/table-core";
 
 declare module "@tanstack/table-core" {
   interface Customize<TData> {
@@ -37,7 +42,11 @@ declare module "@tanstack/table-core" {
     rowCount?: number;
   }
 
-  interface TableMeta<TData extends RowData> {
+  interface TableMeta<
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Must match TanStack Table's merged declaration.
+    in out TFeatures extends TableFeatures,
+    in out TData extends RowData,
+  > {
     isTrash?: (row: TData) => boolean | undefined;
     customize?: Customize<TData>;
     onUpdate?: (row: TData) => void;

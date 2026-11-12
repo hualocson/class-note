@@ -2,12 +2,13 @@
 
 import { useCallback } from "react";
 
-import { Column, FacetedMultipleData } from "@tanstack/react-table";
+import { Column, FacetedMultipleData, RowData } from "@tanstack/react-table";
 
+import type { DataTableFeatures } from "../features";
 import FilterItem from "./filter-item";
 
-interface DataTableFacetedFilterProps<TData, TValue> {
-  column?: Column<TData, TValue>;
+interface DataTableFacetedFilterProps<TData extends RowData, TValue> {
+  column?: Column<DataTableFeatures, TData, TValue>;
   data: FacetedMultipleData[];
 }
 
@@ -24,7 +25,7 @@ const getSelectedValues = (
   return new Set(array);
 };
 
-export function DataTableFacetedMultipleFilter<TData, TValue>({
+export function DataTableFacetedMultipleFilter<TData extends RowData, TValue>({
   column,
   data,
 }: DataTableFacetedFilterProps<TData, TValue>) {
