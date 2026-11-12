@@ -1,13 +1,12 @@
 "use client";
 
-import { PropsWithChildren, useEffect, useState } from "react";
+import { PropsWithChildren } from "react";
 
-import { getPaymentStats } from "@/actions/payments";
-import { PaymentStatus } from "@/enums";
+import type { GetPaymentStatsSuccessResponseData } from "@/actions/types";
 import formatPrice from "@/lib/format-price";
-import { useQuery } from "@tanstack/react-query";
 import { Clock, DollarSign, TrendingUp, XCircle } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Carousel,
@@ -22,37 +21,30 @@ const MobileItem: React.FC<PropsWithChildren> = ({ children }) => {
 };
 
 interface IPaymentStatsSectionProps {
-  filters?: {
-    dateRange?: string;
-    status?: [PaymentStatus, ...PaymentStatus[]];
-    classIds?: string[];
-  };
-  isParentLoading?: boolean;
+  data?: GetPaymentStatsSuccessResponseData;
+  isLoading: boolean;
+  error: Error | null;
+  onRetry: () => void;
 }
 
 const PaymentStatsSection: React.FC<IPaymentStatsSectionProps> = ({
-  filters,
-  isParentLoading,
+  data,
+  isLoading,
+  error,
+  onRetry,
 }) => {
-  const { data, isLoading } = useQuery({
-    queryKey: ["payment-stats", filters],
-    queryFn: async () => {
-      const result = await getPaymentStats(filters);
+  if (error) {
+    return (
+      <div role="alert" className="mb-6 space-y-2">
+        <p>Unable to load payment statistics.</p>
+        <Button variant="outline" size="sm" onClick={onRetry}>
+          Retry statistics
+        </Button>
+      </div>
+    );
+  }
 
-      if (!result.success) {
-        throw new Error(result.error || "Failed to load payment stats");
-      }
-
-      return result.data;
-    },
-  });
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setLoading(isLoading || isParentLoading || false);
-  }, [isLoading, isParentLoading]);
-
-  if (loading) {
+  if (isLoading || !data) {
     return (
       <div className="mb-6">
         <div className="hidden gap-2 md:grid md:grid-cols-2 lg:grid-cols-4">

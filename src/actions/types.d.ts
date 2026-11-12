@@ -1,7 +1,7 @@
 import { getListScheduleForAllClasses } from "./class-schedules";
 import { getClassSessions } from "./class-sessions";
 import { getClasses } from "./classes";
-import { getPayments } from "./payments";
+import { getPaymentStats, getPayments } from "./payments";
 
 export type GetClassSessionsResponse = Awaited<
   ReturnType<typeof getClassSessions>
@@ -27,6 +27,10 @@ export type GetAllClassSchedulesSuccessResponseData = Extract<
 
 // payments
 export type GetPaymentsResponse = Awaited<ReturnType<typeof getPayments>>;
+export type GetPaymentStatsSuccessResponseData = Extract<
+  Awaited<ReturnType<typeof getPaymentStats>>,
+  { success: true }
+>["data"];
 export type GetPaymentsSuccessResponseData = Extract<
   GetPaymentsResponse,
   {

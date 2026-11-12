@@ -1,20 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
-
-import { getPayments } from "@/actions/payments";
 import { GetClassesSuccessResponseData } from "@/actions/types";
-import { PaymentStatus } from "@/enums";
-import { PaginationFetcher } from "@tanstack/react-query";
-import { ColumnFiltersState } from "@tanstack/react-table";
+import type usePaymentsQuery from "@/hooks/usePaymentsQuery";
 import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
 import { DataTable } from "@/components/common/date-table";
-import useDataTable, {
-  makeMeta,
-} from "@/components/common/date-table/hooks/useDataTable";
+import { makeMeta } from "@/components/common/date-table/hooks/useDataTable";
 
 import BulkChangePaymentStatusDialog from "./BulkChangePaymentStatusDialog";
 import BulkDeletePaymentDialog from "./BulkDeletePaymentDialog";
@@ -22,41 +15,12 @@ import { genClassFilter, paymentStatusFilter } from "./TableFilter";
 import columns from "./columns";
 import { PaymentType } from "./type";
 
-const fetcher: PaginationFetcher<PaymentType> = async (pagination, filters) => {
-  try {
-    const response = await getPayments({
-      pagination: {
-        pageIndex: pagination.pageIndex,
-        pageSize: pagination.pageSize,
-      },
-      filters: {
-        status: filters.find((f) => f.id === "status")?.value as [
-          PaymentStatus,
-          ...PaymentStatus[],
-        ],
-        dateRange: filters.find((f) => f.id === "date")?.value as string,
-        classIds: filters.find((f) => f.id === "classIds")?.value as string[],
-      },
-    });
-    if (!response.success) {
-      console.error(response.error);
-      return {
-        rows: [],
-        rowCount: 0,
-      };
-    }
-    return response.data;
-  } catch (error) {
-    console.error("Failed to fetch token transactions:", error);
-    throw error;
-  }
-};
-
 interface IPaymentTableProps {
   onAddPayment: () => void;
   onDeletePayment: (id: string) => void;
   onEditPayment: (payment: PaymentType) => void;
-  onFilterChange: (filters: ColumnFiltersState) => void;
+  query: ReturnType<typeof usePaymentsQuery>;
+  canManagePayments: boolean;
   classes: GetClassesSuccessResponseData["rows"];
 }
 
@@ -64,41 +28,43 @@ const PaymentTable: React.FC<IPaymentTableProps> = ({
   onAddPayment,
   onDeletePayment,
   onEditPayment,
-  onFilterChange,
+  query,
+  canManagePayments,
   classes,
 }) => {
   const {
-    dataQuery,
+    rowsQuery,
+    summaryQuery,
+    rowCount,
     pagination,
     setPagination,
     columnFilters,
     setColumnFilters,
-    facetedFilters,
-    searchFilter,
-    setSearchFilter,
-    dateRangeFilter,
-  } = useDataTable({
-    queryKey: "payments-table",
-    fetcher,
-    facetedFilters: [paymentStatusFilter, genClassFilter(classes)],
-    dateRangeFilter: {
-      key: "date",
-      from: new Date(new Date().setHours(0, 0, 0, 0)).getTime(),
-      to: new Date(new Date().setHours(23, 59, 59, 999)).getTime(),
-    },
-    queryMapKeys: {
-      class: "classIds",
-    },
-  });
+  } = query;
+  const isLoading = rowsQuery.isPending || summaryQuery.isPending;
 
-  useEffect(() => {
-    onFilterChange(columnFilters);
-  }, [columnFilters]);
+  if (rowsQuery.isError || summaryQuery.isError) {
+    return (
+      <div role="alert" className="space-y-2">
+        <p>Unable to load payments.</p>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            void Promise.all([rowsQuery.refetch(), summaryQuery.refetch()]);
+          }}
+        >
+          Retry payments
+        </Button>
+      </div>
+    );
+  }
 
   const meta = makeMeta<PaymentType>({
     menuItems: [
       {
         key: "edit",
+        disabled: () => !canManagePayments,
         children: () => {
           return (
             <button className="flex w-full items-center gap-2">
@@ -142,17 +108,24 @@ const PaymentTable: React.FC<IPaymentTableProps> = ({
   return (
     <DataTable
       columns={columns}
-      data={dataQuery.data ?? { rows: [] }}
+      data={{
+        rows: isLoading ? [] : (rowsQuery.data?.rows ?? []),
+        rowCount: rowCount ?? 0,
+      }}
       pagination={pagination}
       setPagination={setPagination}
       columnFilters={columnFilters}
-      searchFilter={searchFilter}
-      setSearchFilter={setSearchFilter}
+      setSearchFilter={() => {}}
       setColumnFilters={setColumnFilters}
-      isLoading={dataQuery.isPending}
+      isLoading={isLoading}
       meta={meta}
       tableActions={[
-        <Button key="add-payment" size={"sm"} onClick={onAddPayment}>
+        <Button
+          key="add-payment"
+          size={"sm"}
+          onClick={onAddPayment}
+          disabled={!canManagePayments}
+        >
           <PlusIcon />
           Add Payment
         </Button>,
@@ -161,8 +134,15 @@ const PaymentTable: React.FC<IPaymentTableProps> = ({
         bulkDelete: BulkDeletePaymentDialog,
         bulkChangeStatus: BulkChangePaymentStatusDialog,
       }}
-      facetedFilters={facetedFilters}
-      dateRangeFilter={dateRangeFilter}
+      facetedFilters={[
+        paymentStatusFilter,
+        ...(canManagePayments ? [genClassFilter(classes)] : []),
+      ]}
+      dateRangeFilter={{
+        key: "date",
+        from: new Date(new Date().setHours(0, 0, 0, 0)).getTime(),
+        to: new Date(new Date().setHours(23, 59, 59, 999)).getTime(),
+      }}
     />
   );
 };

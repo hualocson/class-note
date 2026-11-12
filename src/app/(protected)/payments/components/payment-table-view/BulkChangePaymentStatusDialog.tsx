@@ -5,6 +5,7 @@ import { useState } from "react";
 import { batchUpdatePaymentsStatus } from "@/actions/payments";
 import { getQueryClient } from "@/app/getQueryClient";
 import { PaymentStatus } from "@/enums";
+import { invalidatePaymentQueries } from "@/lib/payment-query-cache";
 import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import { type Table } from "@tanstack/react-table";
@@ -91,15 +92,9 @@ function BulkChangePaymentStatusDialog<TData extends PaymentType>({
         toast.error("Failed to update payment status");
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["payments-table"],
-        refetchType: "all",
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["payment-stats"],
-        refetchType: "all",
-      });
+    onSuccess: async () => {
+      table.resetRowSelection();
+      await invalidatePaymentQueries(queryClient);
       toast.success("Payment status updated successfully");
       setOpen(false);
       setSelectedStatus(null);

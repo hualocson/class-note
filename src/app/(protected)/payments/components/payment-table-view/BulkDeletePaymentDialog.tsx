@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { deletePayments } from "@/actions/payments";
 import { getQueryClient } from "@/app/getQueryClient";
+import { invalidatePaymentQueries } from "@/lib/payment-query-cache";
 import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import { type Table } from "@tanstack/react-table";
@@ -52,16 +53,10 @@ function BulkDeletePaymentDialog<TData extends PaymentType>({
         toast.error("Failed to delete payments");
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["payments-table"],
-        refetchType: "all",
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["payment-stats"],
-        refetchType: "all",
-      });
-      toast.success("Bookmark list detached successfully");
+    onSuccess: async () => {
+      table.resetRowSelection();
+      await invalidatePaymentQueries(queryClient);
+      toast.success("Payments deleted successfully");
       setOpen(false);
     },
   });
