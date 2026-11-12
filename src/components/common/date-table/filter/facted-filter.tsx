@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 
 import { cn } from "@/lib/utils";
-import { Column, FacetedSingleData } from "@tanstack/react-table";
+import { Column, FacetedSingleData, RowData } from "@tanstack/react-table";
 import { CheckIcon, PlusCircleIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -23,11 +23,16 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 
-interface DataTableFacetedFilterProps<TData, TValue> extends FacetedSingleData {
-  column?: Column<TData, TValue>;
+import type { DataTableFeatures } from "../features";
+
+interface DataTableFacetedFilterProps<
+  TData extends RowData,
+  TValue,
+> extends FacetedSingleData {
+  column?: Column<DataTableFeatures, TData, TValue>;
 }
 
-export function DataTableFacetedFilter<TData, TValue>({
+export function DataTableFacetedFilter<TData extends RowData, TValue>({
   column,
   label: title,
   options,

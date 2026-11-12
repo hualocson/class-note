@@ -6,6 +6,7 @@ import {
   updatePayment,
 } from "@/actions/payments";
 import { PaymentDataType } from "@/app/(protected)/payments/components/form/schema";
+import { invalidatePaymentQueries } from "@/lib/payment-query-cache";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -25,10 +26,9 @@ const usePaymentActions = () => {
 
       return result.data;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Payment created successfully");
-      queryClient.invalidateQueries({ queryKey: ["payments-table"] });
-      queryClient.invalidateQueries({ queryKey: ["payment-stats"] });
+      await invalidatePaymentQueries(queryClient);
     },
     onError: () => {
       toast.error("Failed to create payment");
@@ -48,10 +48,9 @@ const usePaymentActions = () => {
 
       return result.data;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Payment updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["payments-table"] });
-      queryClient.invalidateQueries({ queryKey: ["payment-stats"] });
+      await invalidatePaymentQueries(queryClient);
     },
     onError: () => {
       toast.error("Failed to update payment");
@@ -68,10 +67,9 @@ const usePaymentActions = () => {
 
       return result.data;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Payment deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["payments-table"] });
-      queryClient.invalidateQueries({ queryKey: ["payment-stats"] });
+      await invalidatePaymentQueries(queryClient);
     },
     onError: () => {
       toast.error("Failed to delete payment");

@@ -1,18 +1,19 @@
 "use client";
 
-import { FacetedFilter, Table } from "@tanstack/react-table";
+import { FacetedFilter, RowData, Table } from "@tanstack/react-table";
 import { RotateCcwIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
+import type { DataTableFeatures } from "./features";
 import { DateRangeSelector } from "./filter/date-range-select";
 import { DataTableFacetedMultipleFilter } from "./filter/faceted-multiple-filter";
 import { DataTableFacetedFilter } from "./filter/facted-filter";
 import SearchFilter from "./filter/search-filter";
 import { DataTableViewOptions } from "./view-options";
 
-interface DataTableToolbarProps<TData> {
-  table: Table<TData>;
+interface DataTableToolbarProps<TData extends RowData> {
+  table: Table<DataTableFeatures, TData>;
   facetedFilters?: FacetedFilter<TData>[];
   isFetching?: boolean;
   searchKeys?: Array<{ key: string; label: string }>;
@@ -25,7 +26,7 @@ interface DataTableToolbarProps<TData> {
   rowSelectionDialogs?: Record<string, React.ReactNode>;
 }
 
-export function DataTableToolbar<TData>({
+export function DataTableToolbar<TData extends RowData>({
   table,
   facetedFilters = [],
   searchKeys = [],
@@ -33,12 +34,11 @@ export function DataTableToolbar<TData>({
   rowSelectionDialogs,
   dateRangeFilter,
 }: DataTableToolbarProps<TData>) {
-  const isFiltered = table.getState().columnFilters.length > 0;
+  const isFiltered = table.store.state.columnFilters.length > 0;
 
-  const filteredDateValues = table
-    .getState()
-    .columnFilters.find((c) => c.id === dateRangeFilter?.key)
-    ?.value as number[];
+  const filteredDateValues = table.store.state.columnFilters.find(
+    (c) => c.id === dateRangeFilter?.key
+  )?.value as number[];
 
   const dateRange = filteredDateValues
     ? {

@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Column } from "@tanstack/react-table";
+import { Column, RowData } from "@tanstack/react-table";
 import {
   ArrowDown,
   ArrowUp,
@@ -26,11 +26,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-interface DataTableColumnHeaderProps<TData, TValue> {
-  column: Column<TData, TValue>;
+import type { DataTableFeatures } from "./features";
+
+interface DataTableColumnHeaderProps<TData extends RowData, TValue> {
+  column: Column<DataTableFeatures, TData, TValue>;
   title: string;
 }
-export function DataTableColumnHeader<TData, TValue>({
+export function DataTableColumnHeader<TData extends RowData, TValue>({
   column,
   title,
   className,

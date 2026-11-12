@@ -17,16 +17,21 @@ import {
   OnChangeFn,
   PaginationData,
   PaginationState,
+  RowData,
   TableOptions,
 } from "@tanstack/react-table";
 
-export function makeColumns<TData>(columns: ColumnDef<TData, unknown>[]) {
+import type { DataTableFeatures } from "../features";
+
+export function makeColumns<TData extends RowData>(
+  columns: ColumnDef<DataTableFeatures, TData, unknown>[]
+) {
   return [...columns];
 }
 
-export function makeMeta<TData>(
-  meta: TableOptions<TData>["meta"]
-): TableOptions<TData>["meta"] {
+export function makeMeta<TData extends RowData>(
+  meta: TableOptions<DataTableFeatures, TData>["meta"]
+): TableOptions<DataTableFeatures, TData>["meta"] {
   return {
     isTrash: (row) => {
       const deletedAt = (row as { deletedAt: string | null } | undefined)
@@ -40,7 +45,7 @@ export function makeMeta<TData>(
   };
 }
 
-interface UseDataTableProps<TData> {
+interface UseDataTableProps<TData extends RowData> {
   queryKey: string;
   fetcher: PaginationFetcher<TData>;
   globalFilterKey?: string; // filter
@@ -55,15 +60,19 @@ interface UseDataTableProps<TData> {
   };
 }
 
-interface UseDataTableResult<TData> {
+interface UseDataTableResult<TData extends RowData> {
   dataQuery: UseQueryResult<PaginationData<TData>>;
   pagination: PaginationState;
   setPagination: OnChangeFn<PaginationState>;
   columnFilters: ColumnFiltersState;
   setColumnFilters: OnChangeFn<ColumnFiltersState>;
   facetedFilters: FacetedFilter<TData>[];
-  makeColumns: (columns: ColumnDef<TData>[]) => ColumnDef<TData>[];
-  makeMeta: (meta: TableOptions<TData>["meta"]) => TableOptions<TData>["meta"];
+  makeColumns: (
+    columns: ColumnDef<DataTableFeatures, TData>[]
+  ) => ColumnDef<DataTableFeatures, TData>[];
+  makeMeta: (
+    meta: TableOptions<DataTableFeatures, TData>["meta"]
+  ) => TableOptions<DataTableFeatures, TData>["meta"];
   invalidateQuery: () => void;
 
   // handle search filter
@@ -85,7 +94,7 @@ interface UseDataTableResult<TData> {
     | undefined;
 }
 
-export default function useDataTable<TData>({
+export default function useDataTable<TData extends RowData>({
   queryKey,
   fetcher,
   facetedFilters = [],
